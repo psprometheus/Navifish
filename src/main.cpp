@@ -551,7 +551,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 if (i == 0) {
                     score = self(self, depth - 1, alpha, beta, false);
                 } else {
-                    if (!incheck && quietmove && nonpvnode) {
+                    if (!incheck && quietmove) {
                         int reduction = LMRTable[depth][i];
                         score = self(self, depth - 1 - reduction, alpha, alpha + 1, false);
                     } else {
@@ -600,7 +600,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 if (i == 0) {
                     score = self(self, depth - 1, alpha, beta, true);
                 } else {
-                    if (!incheck && quietmove && nonpvnode) {
+                    if (!incheck && quietmove) {
                         int reduction = LMRTable[depth][i];
                         score = self(self, depth - 1 - reduction, beta - 1, beta, true);
                     } else {
