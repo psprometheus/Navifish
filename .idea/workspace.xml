@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="MyProject" targetName="main" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Release" ENABLED="true" CONFIG_NAME="Release" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/cmake-build-release/.ninja_deps" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-release/.ninja_deps" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-release/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-release/.ninja_log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-release/CMakeFiles/main.dir/src/main.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-release/CMakeFiles/main.dir/src/main.cpp.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-release/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-release/Testing/Temporary/LastTest.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-release/main" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-release/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="20" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/chess.hpp" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="CcBmDUwx" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0000000023413698" />
+      <entry key="MS500" value="1.018788582014034" />
+      <entry key="S2" value="1.3702316147676838" />
+      <entry key="S5" value="1.6720311446463105" />
+      <entry key="S10" value="1.8197750573458005" />
+      <entry key="S30" value="1.9359045674496747" />
+      <entry key="S60" value="1.9674216079092446" />
+      <entry key="M2" value="1.983576812269539" />
+      <entry key="M5" value="2.0373192371305278" />
+      <entry key="M10" value="3.6703390063181325" />
+      <entry key="M15" value="7.65448543369397" />
+      <entry key="M30" value="21.218044168103138" />
+      <entry key="H1" value="38.40763066727803" />
+      <entry key="H2" value="59.392486408339494" />
+      <entry key="H4" value="103.5526085611608" />
+      <entry key="D1" value="1125.3749655060494" />
+      <entry key="W1" value="4601.055134540808" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.0879170569118723E-6" />
+      <entry key="MS500" value="0.06416809660749992" />
+      <entry key="S2" value="0.5033033131619256" />
+      <entry key="S5" value="0.7598570823400576" />
+      <entry key="S10" value="0.8716978159546216" />
+      <entry key="S30" value="0.9552608649149515" />
+      <entry key="S60" value="0.9773744752728943" />
+      <entry key="M2" value="0.9886226809548125" />
+      <entry key="M5" value="1.0013412188153816" />
+      <entry key="M10" value="1.209851023718162" />
+      <entry key="M15" value="1.7060714771237848" />
+      <entry key="M30" value="3.3769112180931833" />
+      <entry key="H1" value="5.651963101288819" />
+      <entry key="H2" value="10.433817522433916" />
+      <entry key="H4" value="24.87944208689646" />
+      <entry key="D1" value="263.54702965249254" />
+      <entry key="W1" value="902.9357553994249" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.824797945873724E-4" />
+      <entry key="MS500" value="0.2065518103615964" />
+      <entry key="S2" value="1.3244183886350414" />
+      <entry key="S5" value="2.1344348444387364" />
+      <entry key="S10" value="2.524958994537919" />
+      <entry key="S30" value="2.8311167100091805" />
+      <entry key="S60" value="2.9141622629838895" />
+      <entry key="M2" value="2.9567269220206365" />
+      <entry key="M5" value="3.0323859319633133" />
+      <entry key="M10" value="4.876191802924361" />
+      <entry key="M15" value="9.35650985608189" />
+      <entry key="M30" value="24.590583105801148" />
+      <entry key="H1" value="44.055712164423426" />
+      <entry key="H2" value="69.82269151053268" />
+      <entry key="H4" value="128.428279177146" />
+      <entry key="D1" value="1388.9148252548628" />
+      <entry key="W1" value="5503.986620772894" />
+    </decayedShown>
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2026" />
+    <option name="minorVersion" value="1.1" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="3DyIpjaKhhcCoYpBBHUtByHTNjt" />
+  <component name="ProjectStatusUIService">{
+  &quot;uiKindId&quot;: &quot;Widget&quot;
+}</component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;CMake Application.main.executor&quot;: &quot;Run&quot;,
+    &quot;CMake Application.train.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/creper/SigmaChessZero/CMakeLists.txt&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="CMake Application.main">
+    <configuration name="Unnamed" type="CMakeListConfigurationType" factoryName="CMakeListConfigurationFactory">
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MyProject" TARGET_NAME="main" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="MyProject" RUN_TARGET_NAME="main">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.main" />
+      <item itemvalue="CMake Debug.Unnamed" />
+    </list>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="" />
+      <created>1779248068315</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779248068315</updated>
+      <workItem from="1779248069530" duration="1836000" />
+      <workItem from="1779250598194" duration="1744000" />
+      <workItem from="1779327200504" duration="1381000" />
+      <workItem from="1779328687322" duration="783000" />
+      <workItem from="1779333205035" duration="5815000" />
+      <workItem from="1779339077394" duration="3746000" />
+      <workItem from="1779355573126" duration="5647000" />
+      <workItem from="1779376644423" duration="43000" />
+      <workItem from="1779413552054" duration="201000" />
+      <workItem from="1779416651251" duration="3000" />
+      <workItem from="1779455501680" duration="9056000" />
+      <workItem from="1779502163516" duration="10138000" />
+      <workItem from="1779528782262" duration="758000" />
+      <workItem from="1779547877973" duration="1000" />
+      <workItem from="1779593153038" duration="13000" />
+      <workItem from="1779596380188" duration="6568000" />
+      <workItem from="1779634385174" duration="254000" />
+      <workItem from="1779672155093" duration="17000" />
+      <workItem from="1779672208604" duration="277000" />
+      <workItem from="1779803753809" duration="2465000" />
+      <workItem from="1779808544422" duration="37000" />
+      <workItem from="1779808636707" duration="35000" />
+      <workItem from="1779808844837" duration="5000" />
+      <workItem from="1779845693789" duration="4915000" />
+      <workItem from="1779859026622" duration="661000" />
+      <workItem from="1779875348526" duration="46000" />
+      <workItem from="1779932114245" duration="298000" />
+      <workItem from="1780061700266" duration="6034000" />
+      <workItem from="1780107270989" duration="2653000" />
+      <workItem from="1780112234526" duration="65000" />
+      <workItem from="1780112567721" duration="50000" />
+      <workItem from="1780112713500" duration="3393000" />
+      <workItem from="1780117804202" duration="8107000" />
+      <workItem from="1780200701554" duration="1486000" />
+      <workItem from="1780202208748" duration="5849000" />
+      <workItem from="1780240107342" duration="166000" />
+      <workItem from="1780277305487" duration="1826000" />
+      <workItem from="1780287582940" duration="599000" />
+      <workItem from="1780299771657" duration="781000" />
+      <workItem from="1780301506862" duration="3000" />
+      <workItem from="1780308076535" duration="4545000" />
+      <workItem from="1780365013059" duration="3947000" />
+      <workItem from="1780392992386" duration="2035000" />
+      <workItem from="1780482469985" duration="13817000" />
+      <workItem from="1780534123534" duration="10060000" />
+      <workItem from="1780563329959" duration="1256000" />
+      <workItem from="1781265001459" duration="2721000" />
+      <workItem from="1781317957575" duration="2845000" />
+      <workItem from="1781362074861" duration="1200000" />
+      <workItem from="1781524043015" duration="5000" />
+      <workItem from="1781926009285" duration="202000" />
+      <workItem from="1782725152654" duration="2252000" />
+      <workItem from="1782912677670" duration="26000" />
+      <workItem from="1783082517029" duration="1000" />
+      <workItem from="1783085228246" duration="599000" />
+      <workItem from="1783134336644" duration="243000" />
+      <workItem from="1783227035401" duration="16274000" />
+      <workItem from="1783606836406" duration="900000" />
+      <workItem from="1783939922363" duration="1227000" />
+      <workItem from="1783941802597" duration="9000" />
+      <workItem from="1783948101015" duration="53000" />
+      <workItem from="1784015805186" duration="1000" />
+      <workItem from="1784021414733" duration="2340000" />
+      <workItem from="1784093425228" duration="1082000" />
+      <workItem from="1784115511133" duration="3186000" />
+      <workItem from="1784174380207" duration="184000" />
+      <workItem from="1784439262635" duration="599000" />
+      <workItem from="1784468129184" duration="774000" />
+      <workItem from="1784552451474" duration="130000" />
+      <workItem from="1784630250084" duration="52000" />
+      <workItem from="1784630838963" duration="7509000" />
+      <workItem from="1784641614596" duration="3094000" />
+      <workItem from="1784719815179" duration="533000" />
+      <workItem from="1784720573372" duration="5000" />
+      <workItem from="1784720662119" duration="7365000" />
+      <workItem from="1784802542866" duration="2000" />
+      <workItem from="1784806081089" duration="705000" />
+      <workItem from="1784811534974" duration="6950000" />
+      <workItem from="1784857304959" duration="1925000" />
+      <workItem from="1784866842777" duration="8466000" />
+      <workItem from="1784882639486" duration="5774000" />
+      <workItem from="1784904917780" duration="3230000" />
+      <workItem from="1784944910200" duration="15592000" />
+      <workItem from="1784990330749" duration="5211000" />
+      <workItem from="1785035304671" duration="19498000" />
+      <workItem from="1785116944420" duration="3800000" />
+      <workItem from="1785125807042" duration="5807000" />
+      <workItem from="1785149292324" duration="12294000" />
+      <workItem from="1785204885106" duration="2000" />
+      <workItem from="1785211202213" duration="6036000" />
+      <workItem from="1785231021529" duration="8158000" />
+      <workItem from="1785288585435" duration="1970000" />
+      <workItem from="1785295448819" duration="2192000" />
+      <workItem from="1785311740531" duration="3000" />
+      <workItem from="1785325034634" duration="9948000" />
+      <workItem from="1785376867567" duration="676000" />
+      <workItem from="1785394657964" duration="5000" />
+      <workItem from="1785402332863" duration="20868000" />
+      <workItem from="1785489851500" duration="13114000" />
+      <workItem from="1785552059953" duration="16124000" />
+      <workItem from="1785637444447" duration="10916000" />
+      <workItem from="1785657788644" duration="12270000" />
+      <workItem from="1785743593409" duration="15546000" />
+      <workItem from="1785820226400" duration="17753000" />
+      <workItem from="1785901027048" duration="3126000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
+    <isAutomaticBootstrapAfterUpdate value="false" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
