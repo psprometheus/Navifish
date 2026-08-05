@@ -534,7 +534,11 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         int ply = currentDepth - depth;
 
-        move_valuing(movelist, board, pvmove, depth, ply);
+        if (ply == 0) {
+            move_valuing(movelist, board, pvmove, depth, ply);
+        } else {
+            move_valuing(movelist, board, chess::Move::NO_MOVE, depth, ply);
+        }
 
         if (maximizingPlayer) {
             float maxEval = -INFINITY;
