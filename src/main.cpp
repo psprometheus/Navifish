@@ -534,6 +534,10 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         int ply = currentDepth - depth;
 
+        int lmp_limit = 5 + 2 * depth * depth;
+
+        int quietsearched = 0;
+
         if (ply == 0) {
             move_valuing(movelist, board, pvmove, depth, ply);
         } else {
@@ -551,6 +555,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
                 bool quietmove = silence_move(board, next_move);
+                if (depth <= 2 && !incheck && quietmove && nonpvnode) {
+                    if (++quietsearched > lmp_limit) continue;
+                }
                 board.makeMove(next_move);
                 if (i == 0) {
                     score = self(self, depth - 1, alpha, beta, false);
@@ -600,6 +607,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
                 bool quietmove = silence_move(board, next_move);
+                if (depth <= 2 && !incheck && quietmove && nonpvnode) {
+                    if (++quietsearched > lmp_limit) continue;
+                }
                 board.makeMove(next_move);
                 if (i == 0) {
                     score = self(self, depth - 1, alpha, beta, true);

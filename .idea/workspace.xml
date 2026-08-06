@@ -6,6 +6,7 @@
   <component name="BackendCodeEditorMiscSettings">
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/OptionsDialog/SelectedPageId/@EntryValue" value="InlayHintsGeneralOptionsPageId" type="string" />
     <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
   </component>
   <component name="CMakePresetLoader">{
@@ -60,61 +61,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000167912819597" />
-      <entry key="MS500" value="1.176013745068224" />
-      <entry key="S2" value="1.88827647388979" />
-      <entry key="S5" value="3.195389946773938" />
-      <entry key="S10" value="4.625418729194928" />
-      <entry key="S30" value="6.514802880648157" />
-      <entry key="S60" value="7.197880322732215" />
-      <entry key="M2" value="7.582661938764152" />
-      <entry key="M5" value="7.828963598209177" />
-      <entry key="M10" value="7.916208794760579" />
-      <entry key="M15" value="8.000479113865342" />
-      <entry key="M30" value="9.819920054675462" />
-      <entry key="H1" value="19.322888707397368" />
-      <entry key="H2" value="40.261252160351624" />
-      <entry key="H4" value="84.3245087914788" />
-      <entry key="D1" value="1077.5906574565104" />
-      <entry key="W1" value="4575.759491310533" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="4.069903628364522E-118" />
+      <entry key="S5" value="3.247039063077162E-47" />
+      <entry key="S10" value="2.2075905931260485E-23" />
+      <entry key="S30" value="2.3601938305433807E-7" />
+      <entry key="S60" value="0.002603051342607598" />
+      <entry key="M2" value="0.2778490275759904" />
+      <entry key="M5" value="4.604570686654031" />
+      <entry key="M10" value="11.750422826534317" />
+      <entry key="M15" value="16.05908286347464" />
+      <entry key="M30" value="21.96539493998278" />
+      <entry key="H1" value="26.456396711188173" />
+      <entry key="H2" value="35.91729325947824" />
+      <entry key="H4" value="66.84084858407688" />
+      <entry key="D1" value="973.3012932644592" />
+      <entry key="W1" value="4519.6828953877675" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="4.139014282799437E-10" />
-      <entry key="MS500" value="0.014410809731418334" />
-      <entry key="S2" value="0.5475623973118744" />
-      <entry key="S5" value="1.3846224901549689" />
-      <entry key="S10" value="1.9956889023214759" />
-      <entry key="S30" value="2.60533037923183" />
-      <entry key="S60" value="2.793822083720734" />
-      <entry key="M2" value="2.894581968575056" />
-      <entry key="M5" value="2.9572591991235075" />
-      <entry key="M10" value="2.9806653462088684" />
-      <entry key="M15" value="3.013881135186938" />
-      <entry key="M30" value="3.4617769049580756" />
-      <entry key="H1" value="5.255901069447693" />
-      <entry key="H2" value="9.754300364741214" />
-      <entry key="H4" value="22.81227558769465" />
-      <entry key="D1" value="255.38408113884546" />
-      <entry key="W1" value="901.3871771383325" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0000059528005996" />
+      <entry key="S2" value="1.0493946979231248" />
+      <entry key="S5" value="1.300242476431592" />
+      <entry key="S10" value="1.5479438624819077" />
+      <entry key="S30" value="1.8182990724310524" />
+      <entry key="S60" value="1.9052867782800402" />
+      <entry key="M2" value="2.0203190777200337" />
+      <entry key="M5" value="3.083887243324215" />
+      <entry key="M10" value="4.769334523701263" />
+      <entry key="M15" value="5.77470081144028" />
+      <entry key="M30" value="7.147328920659013" />
+      <entry key="H1" value="8.215969755463226" />
+      <entry key="H2" value="10.460344237995027" />
+      <entry key="H4" value="19.01272389645294" />
+      <entry key="D1" value="232.5594195332863" />
+      <entry key="W1" value="893.4298638439018" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.0013920996185307292" />
-      <entry key="MS500" value="0.3386863413327931" />
-      <entry key="S2" value="1.7727480571417853" />
-      <entry key="S5" value="4.037050535209067" />
-      <entry key="S10" value="6.230824186862692" />
-      <entry key="S30" value="8.94573011383351" />
-      <entry key="S60" value="9.897167782914437" />
-      <entry key="M2" value="10.427969858993151" />
-      <entry key="M5" value="10.766007298090498" />
-      <entry key="M10" value="10.886674844393026" />
-      <entry key="M15" value="11.007495099200401" />
-      <entry key="M30" value="13.27778995086333" />
-      <entry key="H1" value="24.575749018919495" />
-      <entry key="H2" value="50.01256457098011" />
-      <entry key="H4" value="107.13346150698781" />
-      <entry key="D1" value="1332.967828056096" />
-      <entry key="W1" value="5477.142416298054" />
+      <entry key="MS100" value="0.0259162358067013" />
+      <entry key="MS500" value="0.4816335633836865" />
+      <entry key="S2" value="0.8732828529670077" />
+      <entry key="S5" value="1.2060948340307147" />
+      <entry key="S10" value="1.4900082545315183" />
+      <entry key="S30" value="1.7950616233797438" />
+      <entry key="S60" value="1.8956340566228904" />
+      <entry key="M2" value="2.2913415617504866" />
+      <entry key="M5" value="7.682401849675351" />
+      <entry key="M10" value="16.51402879893233" />
+      <entry key="M15" value="21.82888332400879" />
+      <entry key="M30" value="29.109529440064453" />
+      <entry key="H1" value="34.670415188224055" />
+      <entry key="H2" value="46.37605287084886" />
+      <entry key="H4" value="85.85156910694381" />
+      <entry key="D1" value="1205.8545753266471" />
+      <entry key="W1" value="5413.108574571297" />
     </decayedShown>
   </component>
   <component name="ProjectApplicationVersion">
@@ -135,35 +136,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;CMake Application.main.executor&quot;: &quot;Run&quot;,
-    &quot;CMake Application.train.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/creper/SigmaChessZero/CMakeLists.txt&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.first.attach.projects&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "CMake Application.main.executor": "Run",
+    "CMake Application.train.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/creper/SigmaChessZero",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="CMake Application.main">
     <configuration name="Unnamed" type="CMakeListConfigurationType" factoryName="CMakeListConfigurationFactory">
       <method v="2" />
@@ -289,7 +290,10 @@
       <workItem from="1785657788644" duration="12270000" />
       <workItem from="1785743593409" duration="15546000" />
       <workItem from="1785820226400" duration="17753000" />
-      <workItem from="1785901027048" duration="5697000" />
+      <workItem from="1785901027048" duration="12298000" />
+      <workItem from="1785984920989" duration="33000" />
+      <workItem from="1785984983616" duration="929000" />
+      <workItem from="1785985941904" duration="9531000" />
     </task>
     <servers />
   </component>
