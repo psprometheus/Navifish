@@ -466,25 +466,25 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 return 0;
             }
         }
+        bool incheck = board.inCheck();
+        bool shouldContinue = (!incheck && !board.isInsufficientMaterial() && !board.isRepetition() && !board.isHalfMoveDraw());
         TTEntry entry = TTTable::get(board);
-        if (entry.key == board.hash() && entry.depth >= depth) {
+        if (entry.key == board.hash() && entry.depth >= depth && shouldContinue) {
             if (entry.flag == EXACT) return entry.eval;
             if (entry.flag == LOWERBOUND && entry.eval >= beta) return entry.eval;
             if (entry.flag == UPPERBOUND && entry.eval <= alpha) return entry.eval;
         }
 
-        bool incheck = board.inCheck();
-
         float score;
 
         if (depth <= 0) {
-            if (incheck) {
+            if (!shouldContinue) {
                 chess::Movelist movelist;
                 chess::movegen::legalmoves(movelist, board);
                 int board_end = check_board(board, movelist.size());
                 if (board_end == -1) {
                     return (board.sideToMove() ? INFINITY : -INFINITY);
-                }
+                } else if (board_end == 0) return drawfactor;
             }
             return quiesce(quiesce, board, maximizingPlayer, alpha, beta);
         }
@@ -493,7 +493,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         bool nonpvnode = (beta - alpha == 1);
 
-        if (!incheck && nonpvnode) {
+        if (shouldContinue && nonpvnode) {
             if (depth <= 3) {
                 float margin = depth * 100;
                 if (maximizingPlayer) {
@@ -544,7 +544,10 @@ void search(chess::Board& board, int search_depth, int movetime) {
             move_valuing(movelist, board, chess::Move::NO_MOVE, depth, ply);
         }
 
+        //float fp_margin = depth * 150;
+
         if (maximizingPlayer) {
+            //bool fp_prune = (static_eval + fp_margin <= alpha);
             float maxEval = -INFINITY;
             for (int i = 0; i < movelist.size(); i++) {
                 int best_index = i;
@@ -555,8 +558,10 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
                 bool quietmove = silence_move(board, next_move);
-                if (depth <= 2 && !incheck && quietmove && nonpvnode) {
-                    if (++quietsearched > lmp_limit) continue;
+                if (depth <= 2) {
+                    if (!incheck && quietmove && nonpvnode) {
+                        if (++quietsearched > lmp_limit) continue;
+                    }
                 }
                 board.makeMove(next_move);
                 if (i == 0) {
@@ -597,6 +602,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
             return maxEval;
         } else {
+            //bool fp_prune = (static_eval - fp_margin >= beta);
             float minEval = INFINITY;
             for (int i = 0; i < movelist.size(); i++) {
                 int best_index = i;
@@ -607,8 +613,10 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
                 bool quietmove = silence_move(board, next_move);
-                if (depth <= 2 && !incheck && quietmove && nonpvnode) {
-                    if (++quietsearched > lmp_limit) continue;
+                if (depth <= 2) {
+                    if (!incheck && quietmove && nonpvnode) {
+                        if (++quietsearched > lmp_limit) continue;
+                    }
                 }
                 board.makeMove(next_move);
                 if (i == 0) {

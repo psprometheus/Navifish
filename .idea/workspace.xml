@@ -161,7 +161,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "settings.editor.selected.configurable": "editor.preferences.completion.inline",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -293,7 +293,8 @@
       <workItem from="1785901027048" duration="12298000" />
       <workItem from="1785984920989" duration="33000" />
       <workItem from="1785984983616" duration="929000" />
-      <workItem from="1785985941904" duration="9531000" />
+      <workItem from="1785985941904" duration="10408000" />
+      <workItem from="1786062822208" duration="9395000" />
     </task>
     <servers />
   </component>
