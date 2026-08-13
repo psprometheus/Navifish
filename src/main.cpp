@@ -226,19 +226,11 @@ int eval(const chess::Board& board)
     return (board.sideToMove() ? -eval : eval);
 }
 
-int check_board(const chess::Board& board, uint8_t len)
-{
-    if (board.isInsufficientMaterial() || board.isRepetition()) return 0;
-    if (board.isHalfMoveDraw()) return (board.getHalfMoveDrawType().first == chess::GameResultReason::CHECKMATE ? -1 : 0);
-    if (len == 0) return (board.inCheck() ? -1 : 0);
-    return 1;
-}
-
 void print_board(const chess::Board& board) {
     cout << board;
 }
 
-constexpr int nodespercheck = 4096 - 1;
+constexpr int nodespercheck = (1 << 11) - 1;
 
 constexpr int EXACT = 0;
 constexpr int UPPERBOUND = 1;
@@ -288,20 +280,19 @@ private:
 };
 
 bool silence_move(chess::Board& board, const chess::Move& move) {
-    //board.makeMove(move);
-    //if (board.inCheck()) {
-    //    board.unmakeMove(move);
-    //    return 0;
-    //}
-    //board.unmakeMove(move);
-    return (move.typeOf() != chess::Move::ENPASSANT && move.typeOf() != chess::Move::PROMOTION && board.at(move.to()) == chess::Piece::NONE);
+    if (board.at(move.to()) != chess::Piece::NONE)
+        return 0;
+    if (move.typeOf() == chess::Move::PROMOTION || move.typeOf() == chess::Move::ENPASSANT)
+        return 0;
+    if (board.givesCheck(move) != chess::CheckType::NO_CHECK)
+        return 0;
+    return 1;
 }
 
 constexpr float drawfactor = -0.1;
 
 constexpr float delta = 50;
 constexpr float R = 2;
-constexpr float reduce_factor = 0.25;
 constexpr float LMR_Scaling = 5;
 constexpr float LMR_Base = 0;
 
@@ -321,11 +312,11 @@ void init_lmr() {
 
 int16_t ButterflyHeuristic[64][64] = {0};
 
-constexpr int16_t TTMoveScore = 30000;
-constexpr int16_t PVMoveScore = 20000;
-constexpr int16_t CaptureBase = 10000;
-constexpr int16_t HistoryBase =-10000;
-constexpr int16_t HistoryLimit = 8000;
+constexpr int16_t TTMoveScore = 32767;
+constexpr int16_t PVMoveScore = 32766;
+constexpr int16_t CaptureBase = 32700;
+constexpr int16_t HistoryInit = -30000;
+constexpr int16_t HistoryLimit = 30000;
 
 int16_t MVV_LVA[7][6] = {
     {15, 14, 13, 12, 11, 10}, // P
@@ -341,7 +332,7 @@ int16_t MVV_LVA[7][6] = {
 void HistoryReset() {
     for (int y = 0; y < 64; y++) {
         for (int x = 0; x < 64; x++) {
-            ButterflyHeuristic[y][x] = 0;
+            ButterflyHeuristic[y][x] = HistoryInit;
         }
     }
 }
@@ -366,14 +357,14 @@ void move_valuing(chess::Movelist& movelist, chess::Board& board, const chess::M
         chess::PieceType ptto = board.at(move.to()).type();
         if (silence_move(board, move)) {
             if (move == KillerMoves[ply][0]) {
-                move.setScore(9000);
+                move.setScore(32650);
                 continue;
             } else if (move == KillerMoves[ply][1]) {
-                move.setScore(8000);
+                move.setScore(32600);
                 continue;
             }
             int16_t score = ButterflyHeuristic[move.from().index()][move.to().index()];
-            move.setScore(HistoryBase + score);
+            move.setScore(score);
         } else {
             int16_t score = MVV_LVA[ptto][ptfrom];
             move.setScore(CaptureBase + score);
@@ -402,17 +393,28 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 return 0;
             }
         }
+        float best_value;
+        bool incheck = board.inCheck();
         chess::Movelist movelist;
-        chess::movegen::legalmoves<chess::movegen::MoveGenType::CAPTURE>(movelist, board);
-
-        float best_value = eval(board);
-
-        if (maximizingPlayer) {
-            if (best_value >= beta) return best_value;
-            alpha = max(alpha, best_value);
+        if (incheck) {
+            chess::movegen::legalmoves(movelist, board);
+            if (movelist.size() == 0)
+                return (board.sideToMove() ? INFINITY : -INFINITY);
         } else {
-            if (best_value <= alpha) return best_value;
-            beta = min(beta, best_value);
+            chess::movegen::legalmoves<chess::movegen::MoveGenType::CAPTURE>(movelist, board);
+        }
+
+        if (!incheck) {
+            best_value = eval(board);
+            if (maximizingPlayer) {
+                if (best_value >= beta) return best_value;
+                alpha = max(alpha, best_value);
+            } else {
+                if (best_value <= alpha) return best_value;
+                beta = min(beta, best_value);
+            }
+        } else {
+            best_value = (maximizingPlayer ? -INFINITY : INFINITY);
         }
 
         move_valuing(movelist, board, chess::Move::NO_MOVE);
@@ -459,7 +461,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
         return best_value;
     };
 
-    auto minimax = [&](auto&& self, int depth, float alpha, float beta, bool maximizingPlayer) -> float {
+    auto minimax = [&](auto&& self, int depth, int ply, float alpha, float beta, bool maximizingPlayer) -> float {
         if ((++nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
@@ -467,9 +469,18 @@ void search(chess::Board& board, int search_depth, int movetime) {
             }
         }
         bool incheck = board.inCheck();
-        bool shouldContinue = (!incheck && !board.isInsufficientMaterial() && !board.isRepetition() && !board.isHalfMoveDraw());
+        if (board.isRepetition() || board.isInsufficientMaterial()) {
+            return drawfactor;
+        }
+        if (board.isHalfMoveDraw()) {
+            if (board.getHalfMoveDrawType().first == chess::GameResultReason::CHECKMATE)
+                return (board.sideToMove() ? INFINITY : -INFINITY);
+            else
+                return drawfactor;
+        }
+
         TTEntry entry = TTTable::get(board);
-        if (entry.key == board.hash() && entry.depth >= depth && shouldContinue) {
+        if (entry.key == board.hash() && entry.depth >= depth && !incheck) {
             if (entry.flag == EXACT) return entry.eval;
             if (entry.flag == LOWERBOUND && entry.eval >= beta) return entry.eval;
             if (entry.flag == UPPERBOUND && entry.eval <= alpha) return entry.eval;
@@ -478,14 +489,6 @@ void search(chess::Board& board, int search_depth, int movetime) {
         float score;
 
         if (depth <= 0) {
-            if (!shouldContinue) {
-                chess::Movelist movelist;
-                chess::movegen::legalmoves(movelist, board);
-                int board_end = check_board(board, movelist.size());
-                if (board_end == -1) {
-                    return (board.sideToMove() ? INFINITY : -INFINITY);
-                } else if (board_end == 0) return drawfactor;
-            }
             return quiesce(quiesce, board, maximizingPlayer, alpha, beta);
         }
 
@@ -493,9 +496,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         bool nonpvnode = (beta - alpha == 1);
 
-        if (shouldContinue && nonpvnode) {
+        if (!incheck && nonpvnode) {
             if (depth <= 3) {
-                float margin = depth * 100;
+                float margin = 100 * depth;
                 if (maximizingPlayer) {
                     if (static_eval - margin >= beta)
                         return static_eval;
@@ -508,12 +511,12 @@ void search(chess::Board& board, int search_depth, int movetime) {
             if (depth > R && board.hasNonPawnMaterial(board.sideToMove())) {
                 board.makeNullMove();
                 if (maximizingPlayer) {
-                    score = self(self, depth - 1 - R, beta - 1, beta, false);
+                    score = self(self, depth - 1 - R, ply, beta - 1, beta, false);
                     board.unmakeNullMove();
                     if (score >= beta) return beta;
                 }
                 else {
-                    score = self(self, depth - 1 - R, alpha, alpha + 1, true);
+                    score = self(self, depth - 1 - R, ply, alpha, alpha + 1, true);
                     board.unmakeNullMove();
                     if (score <= alpha) return alpha;
                 }
@@ -525,14 +528,14 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         chess::Movelist movelist;
         chess::movegen::legalmoves(movelist, board);
-        int board_end = check_board(board, movelist.size());
-        if (board_end == -1) {
-            return (board.sideToMove() ? INFINITY : -INFINITY);
-        } else if (board_end == 0) return drawfactor;
-        
-        chess::Move bestmoveply = movelist[0];
+        if (movelist.empty()) {
+            if (incheck)
+                return (board.sideToMove() ? INFINITY : -INFINITY);
+            else
+                return drawfactor;
+        }
 
-        int ply = currentDepth - depth;
+        chess::Move bestmoveply = movelist[0];
 
         int lmp_limit = 5 + 2 * depth * depth;
 
@@ -565,15 +568,15 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 }
                 board.makeMove(next_move);
                 if (i == 0) {
-                    score = self(self, depth - 1, alpha, beta, false);
+                    score = self(self, depth - 1, ply + 1, alpha, beta, false);
                 } else {
                     if (!incheck && quietmove) {
                         int reduction = LMRTable[depth][i];
-                        score = self(self, depth - 1 - reduction, alpha, alpha + 1, false);
+                        score = self(self, depth - 1 - reduction, ply + 1, alpha, alpha + 1, false);
                     } else {
-                        score = self(self, depth - 1, alpha, alpha + 1, false);
+                        score = self(self, depth - 1, ply + 1, alpha, alpha + 1, false);
                     }
-                    if (score > alpha && score < beta) score = self(self, depth - 1, alpha, beta, false);
+                    if (score > alpha && score < beta) score = self(self, depth - 1, ply + 1, alpha, beta, false);
                 }
                 board.unmakeMove(next_move);
                 if (stop) return 0;
@@ -584,12 +587,13 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 alpha = max(alpha, score);
                 if (alpha >= beta) {
                     TTTable::add(board, maxEval, bestmoveply, depth, LOWERBOUND);
-                    if (quietmove && ButterflyHeuristic[next_move.from().index()][next_move.to().index()] < HistoryLimit) {
+                    if (quietmove) {
                         if (KillerMoves[ply][0] != next_move) {
                             KillerMoves[ply][1] = KillerMoves[ply][0];
                             KillerMoves[ply][0] = next_move;
                         }
-                        ButterflyHeuristic[next_move.from().index()][next_move.to().index()] += depth * depth * reduce_factor;
+                        if (ButterflyHeuristic[next_move.from().index()][next_move.to().index()] < HistoryLimit)
+                            ButterflyHeuristic[next_move.from().index()][next_move.to().index()] += depth * depth;
                     }
                     return maxEval;
                 }
@@ -597,7 +601,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
             if (maxEval <= original_alpha)
                 TTTable::add(board, maxEval, bestmoveply, depth, UPPERBOUND);
-            else 
+            else
                 TTTable::add(board, maxEval, bestmoveply, depth, EXACT);
 
             return maxEval;
@@ -620,15 +624,15 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 }
                 board.makeMove(next_move);
                 if (i == 0) {
-                    score = self(self, depth - 1, alpha, beta, true);
+                    score = self(self, depth - 1, ply + 1, alpha, beta, true);
                 } else {
                     if (!incheck && quietmove) {
                         int reduction = LMRTable[depth][i];
-                        score = self(self, depth - 1 - reduction, beta - 1, beta, true);
+                        score = self(self, depth - 1 - reduction, ply + 1, beta - 1, beta, true);
                     } else {
-                        score = self(self, depth - 1, beta - 1, beta, true);
+                        score = self(self, depth - 1, ply + 1, beta - 1, beta, true);
                     }
-                    if (score < beta && score > alpha) score = self(self, depth - 1, alpha, beta, true);
+                    if (score < beta && score > alpha) score = self(self, depth - 1, ply + 1, alpha, beta, true);
                 }
                 board.unmakeMove(next_move);
                 if (stop) return 0;
@@ -639,12 +643,13 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 beta = min(beta, score);
                 if (alpha >= beta) {
                     TTTable::add(board, minEval, bestmoveply, depth, UPPERBOUND);
-                    if (quietmove && ButterflyHeuristic[next_move.from().index()][next_move.to().index()] < HistoryLimit) {
+                    if (quietmove) {
                         if (KillerMoves[ply][0] != next_move) {
                             KillerMoves[ply][1] = KillerMoves[ply][0];
                             KillerMoves[ply][0] = next_move;
                         }
-                        ButterflyHeuristic[next_move.from().index()][next_move.to().index()] += depth * depth * reduce_factor;
+                        if (ButterflyHeuristic[next_move.from().index()][next_move.to().index()] < HistoryLimit)
+                            ButterflyHeuristic[next_move.from().index()][next_move.to().index()] += depth * depth;
                     }
                     return minEval;
                 }
@@ -676,7 +681,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 alpha = last_eval - k * delta;
                 beta = last_eval + k * delta;
             }
-            root_eval = minimax(minimax, currentDepth, alpha, beta, maximizingPlayer);
+            root_eval = minimax(minimax, currentDepth, 0, alpha, beta, maximizingPlayer);
             if (stop) break;
             if (root_eval == INFINITY || root_eval == -INFINITY) break;
             fail = !(root_eval > alpha && root_eval < beta);
@@ -727,6 +732,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 int main() {
     cout.setf(std::ios::unitbuf);
 
+    HistoryReset();
     init_tables();
     init_lmr();
 
@@ -749,7 +755,7 @@ int main() {
             board = chess::Board();
         } else if (command == "go") {
             ss >> command;
-            int searchdepth = INT_MAX;
+            int searchdepth = MAX_PLY;
             int movetime = INT_MAX;
             if (command == "depth") {
                 ss >> command;
