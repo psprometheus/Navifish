@@ -291,7 +291,7 @@ constexpr float drawfactor = -0.1;
 
 constexpr float delta = 50;
 constexpr int R = 2;
-constexpr float LMR_Scaling = 5;
+constexpr float LMR_Scaling = 3;
 constexpr float LMR_Base = 0;
 
 constexpr int MAX_PLY = 128;
