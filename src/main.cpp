@@ -14,7 +14,6 @@ using namespace std;
 #define QUEEN  4
 #define KING   5
 
-/* board representation */
 #define WHITE  0
 #define BLACK  1
 
@@ -216,11 +215,10 @@ int eval(const chess::Board& board)
 
     }
 
-    /* tapered eval */
     int mgScore = mg[board.sideToMove()] - mg[OTHER(board.sideToMove())];
     int egScore = eg[board.sideToMove()] - eg[OTHER(board.sideToMove())];
     int mgPhase = gamePhase;
-    if (mgPhase > 24) mgPhase = 24; /* in case of early promotion */
+    if (mgPhase > 24) mgPhase = 24;
     int egPhase = 24 - mgPhase;
     float eval = (mgScore * mgPhase + egScore * egPhase) / 24;
     return (board.sideToMove() ? -eval : eval);
@@ -317,6 +315,8 @@ constexpr int16_t PVMoveScore = 32766;
 constexpr int16_t CaptureBase = 32700;
 constexpr int16_t HistoryInit = -30000;
 constexpr int16_t HistoryLimit = 30000;
+constexpr int16_t KillerMove1Score = CaptureBase - 50;
+constexpr int16_t KillerMove2Score = CaptureBase - 100;
 
 int16_t MVV_LVA[7][6] = {
     {15, 14, 13, 12, 11, 10}, // P
@@ -357,10 +357,10 @@ void move_valuing(chess::Movelist& movelist, chess::Board& board, const chess::M
         chess::PieceType ptto = board.at(move.to()).type();
         if (silence_move(board, move)) {
             if (move == KillerMoves[ply][0]) {
-                move.setScore(32650);
+                move.setScore(KillerMove1Score);
                 continue;
             } else if (move == KillerMoves[ply][1]) {
-                move.setScore(32600);
+                move.setScore(KillerMove2Score);
                 continue;
             }
             int16_t score = ButterflyHeuristic[move.from().index()][move.to().index()];
@@ -398,7 +398,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
         chess::Movelist movelist;
         if (incheck) {
             chess::movegen::legalmoves(movelist, board);
-            if (movelist.size() == 0)
+            if (movelist.empty())
                 return (board.sideToMove() ? INFINITY : -INFINITY);
         } else {
             chess::movegen::legalmoves<chess::movegen::MoveGenType::CAPTURE>(movelist, board);
@@ -468,7 +468,6 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 return 0;
             }
         }
-        bool incheck = board.inCheck();
         if (board.isRepetition() || board.isInsufficientMaterial()) {
             return drawfactor;
         }
@@ -478,7 +477,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
             else
                 return drawfactor;
         }
-
+        bool incheck = board.inCheck();
         TTEntry entry = TTTable::get(board);
         if (entry.key == board.hash() && entry.depth >= depth && !incheck) {
             if (entry.flag == EXACT) return entry.eval;
@@ -562,15 +561,16 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 chess::Move next_move = movelist[i];
                 bool quietmove = silence_move(board, next_move);
                 if (depth <= 2) {
-                    if (!incheck && quietmove && nonpvnode) {
+                    if (quietmove && !incheck && nonpvnode) {
                         if (++quietsearched > lmp_limit) continue;
                     }
                 }
+                bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
                 board.makeMove(next_move);
                 if (i == 0) {
                     score = self(self, depth - 1, ply + 1, alpha, beta, false);
                 } else {
-                    if (!incheck && quietmove) {
+                    if (depth >= 3 && quietmove && !killermove && !incheck) {
                         int reduction = LMRTable[depth][i];
                         score = self(self, depth - 1 - reduction, ply + 1, alpha, alpha + 1, false);
                     } else {
@@ -618,15 +618,16 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 chess::Move next_move = movelist[i];
                 bool quietmove = silence_move(board, next_move);
                 if (depth <= 2) {
-                    if (!incheck && quietmove && nonpvnode) {
+                    if (quietmove && !incheck && nonpvnode) {
                         if (++quietsearched > lmp_limit) continue;
                     }
                 }
+                bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
                 board.makeMove(next_move);
                 if (i == 0) {
                     score = self(self, depth - 1, ply + 1, alpha, beta, true);
                 } else {
-                    if (!incheck && quietmove) {
+                    if (depth >= 3 && quietmove && !killermove && !incheck) {
                         int reduction = LMRTable[depth][i];
                         score = self(self, depth - 1 - reduction, ply + 1, beta - 1, beta, true);
                     } else {

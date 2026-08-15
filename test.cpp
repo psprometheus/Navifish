@@ -1,7 +1,7 @@
 #include <iostream>
+#include "src/chess.hpp"
 
 using namespace std;
-
 
 #define PAWN   0
 #define KNIGHT 1
@@ -14,65 +14,11 @@ using namespace std;
 #define WHITE  0
 #define BLACK  1
 
-#define WHITE_PAWN      (2*PAWN   + WHITE)
-#define BLACK_PAWN      (2*PAWN   + BLACK)
-#define WHITE_KNIGHT    (2*KNIGHT + WHITE)
-#define BLACK_KNIGHT    (2*KNIGHT + BLACK)
-#define WHITE_BISHOP    (2*BISHOP + WHITE)
-#define BLACK_BISHOP    (2*BISHOP + BLACK)
-#define WHITE_ROOK      (2*ROOK   + WHITE)
-#define BLACK_ROOK      (2*ROOK   + BLACK)
-#define WHITE_QUEEN     (2*QUEEN  + WHITE)
-#define BLACK_QUEEN     (2*QUEEN  + BLACK)
-#define WHITE_KING      (2*KING   + WHITE)
-#define BLACK_KING      (2*KING   + BLACK)
-#define EMPTY           (BLACK_KING  +  1)
-
-#define PCOLOR(p) ((p)&1)
-
-int side2move = 0;
-int board[64] = {
-    // Rank 8
-    BLACK_ROOK, EMPTY, EMPTY, EMPTY,
-    BLACK_KING, EMPTY, EMPTY, BLACK_ROOK,
-
-    // Rank 7
-    BLACK_PAWN, EMPTY, BLACK_PAWN, BLACK_PAWN,
-    BLACK_QUEEN, BLACK_PAWN, BLACK_BISHOP, EMPTY,
-
-    // Rank 6
-    BLACK_BISHOP, BLACK_KNIGHT, EMPTY, EMPTY,
-    BLACK_PAWN, BLACK_KNIGHT, BLACK_PAWN, EMPTY,
-
-    // Rank 5
-    EMPTY, EMPTY, EMPTY, WHITE_PAWN,
-    WHITE_KNIGHT, EMPTY, EMPTY, EMPTY,
-
-    // Rank 4
-    EMPTY, BLACK_PAWN, EMPTY, EMPTY,
-    WHITE_PAWN, EMPTY, EMPTY, EMPTY,
-
-    // Rank 3
-    EMPTY, EMPTY, WHITE_KNIGHT, EMPTY,
-    EMPTY, WHITE_QUEEN, EMPTY, BLACK_PAWN,
-
-    // Rank 2
-    WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_BISHOP,
-    WHITE_BISHOP, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-
-    // Rank 1
-    WHITE_ROOK, EMPTY, EMPTY, EMPTY,
-    WHITE_KING, EMPTY, EMPTY, WHITE_ROOK
-};
-
 #define FLIP(sq) ((sq)^56)
 #define OTHER(side) ((side)^ 1)
 
 int mg_value[6] = { 82, 337, 365, 477, 1025,  0};
 int eg_value[6] = { 94, 281, 297, 512,  936,  0};
-
-/* piece/sq tables */
-/* values from Rofchade: http://www.talkchess.com/forum3/viewtopic.php?f=2&t=68311&start=19 */
 
 int mg_pawn_table[64] = {
       0,   0,   0,   0,   0,   0,  0,   0,
@@ -226,24 +172,24 @@ int* eg_pesto_table[6] =
     eg_king_table
 };
 
-int gamephaseInc[12] = {0,0,1,1,1,1,2,2,4,4,0,0};
+int gamephaseInc[12] = {0,1,1,2,4,0,0,1,1,2,4,0};
 int mg_table[12][64];
 int eg_table[12][64];
 
 void init_tables()
 {
     int pc, p, sq;
-    for (p = PAWN, pc = WHITE_PAWN; p <= KING; pc += 2, p++) {
+    for (p = PAWN, pc = 0; p <= KING; pc++, p++) {
         for (sq = 0; sq < 64; sq++) {
             mg_table[pc]  [sq] = mg_value[p] + mg_pesto_table[p][sq];
             eg_table[pc]  [sq] = eg_value[p] + eg_pesto_table[p][sq];
-            mg_table[pc+1][sq] = mg_value[p] + mg_pesto_table[p][FLIP(sq)];
-            eg_table[pc+1][sq] = eg_value[p] + eg_pesto_table[p][FLIP(sq)];
+            mg_table[pc+6][sq] = mg_value[p] + mg_pesto_table[p][FLIP(sq)];
+            eg_table[pc+6][sq] = eg_value[p] + eg_pesto_table[p][FLIP(sq)];
         }
     }
 }
 
-int eval()
+int eval(const chess::Board& board)
 {
     int mg[2];
     int eg[2];
@@ -254,27 +200,35 @@ int eval()
     eg[WHITE] = 0;
     eg[BLACK] = 0;
 
-    /* evaluate each piece */
-    for (int sq = 0; sq < 64; ++sq) {
-        int pc = board[sq];
-        if (pc != EMPTY) {
-            mg[PCOLOR(pc)] += mg_table[pc][sq];
-            eg[PCOLOR(pc)] += eg_table[pc][sq];
-            gamePhase += gamephaseInc[pc];
-        }
+    uint64_t bb = board.occ().getBits();
+
+    while (bb) {
+        int sq = __builtin_ctzll(bb);
+        bb &= bb - 1;
+        chess::Piece piece = board.at(sq);
+        mg[piece.color()] += mg_table[piece][FLIP(sq)];
+        eg[piece.color()] += eg_table[piece][FLIP(sq)];
+        gamePhase += gamephaseInc[piece];
+
     }
 
     /* tapered eval */
-    int mgScore = mg[side2move] - mg[OTHER(side2move)];
-    int egScore = eg[side2move] - eg[OTHER(side2move)];
+    int mgScore = mg[board.sideToMove()] - mg[OTHER(board.sideToMove())];
+    int egScore = eg[board.sideToMove()] - eg[OTHER(board.sideToMove())];
     int mgPhase = gamePhase;
     if (mgPhase > 24) mgPhase = 24; /* in case of early promotion */
     int egPhase = 24 - mgPhase;
-    return (mgScore * mgPhase + egScore * egPhase) / 24;
+    float eval = (mgScore * mgPhase + egScore * egPhase) / 24;
+    return (board.sideToMove() ? -eval : eval);
 }
 
 int main() {
-    int a = 1 << 20;
+    init_tables();
 
-    cout << a << endl;
+    chess::Board board("rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1");
+
+    cout << board << endl;
+
+    cout << eval(board) << endl;
+
 }
