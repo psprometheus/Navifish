@@ -4,7 +4,7 @@
 #include <sstream>
 #include <chrono>
 #include <deque>
-#include "chess.hpp"
+#include "include.hpp"
 using namespace std;
 
 #define CHESS_USE_PEXT
