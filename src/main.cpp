@@ -7,6 +7,8 @@
 #include "chess.hpp"
 using namespace std;
 
+#define CHESS_USE_PEXT
+
 #define PAWN   0
 #define KNIGHT 1
 #define BISHOP 2
