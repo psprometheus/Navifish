@@ -290,7 +290,7 @@ bool silence_move(chess::Board& board, const chess::Move& move) {
 constexpr float drawfactor = -0.1;
 
 constexpr float delta = 50;
-constexpr float R = 2;
+constexpr int R = 2;
 constexpr float LMR_Scaling = 5;
 constexpr float LMR_Base = 0;
 
