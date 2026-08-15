@@ -496,15 +496,13 @@ void search(chess::Board& board, int search_depth, int movetime) {
         bool nonpvnode = (beta - alpha == 1);
 
         if (!incheck && nonpvnode) {
-            if (depth <= 3) {
-                float margin = 100 * depth;
-                if (maximizingPlayer) {
-                    if (static_eval - margin >= beta)
-                        return static_eval;
-                } else {
-                    if (static_eval + margin <= alpha) {
-                        return static_eval;
-                    }
+            float margin = 150 * depth;
+            if (maximizingPlayer) {
+                if (static_eval - margin >= beta)
+                    return static_eval;
+            } else {
+                if (static_eval + margin <= alpha) {
+                    return static_eval;
                 }
             }
             if (depth > R && board.hasNonPawnMaterial(board.sideToMove())) {
