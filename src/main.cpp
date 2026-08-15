@@ -22,6 +22,10 @@ using namespace std;
 #define FLIP(sq) ((sq)^56)
 #define OTHER(side) ((side)^ 1)
 
+#define EXACT 0
+#define UPPERBOUND 1
+#define LOWERBOUND -1
+
 int mg_value[6] = { 82, 337, 365, 477, 1025,  0};
 int eg_value[6] = { 94, 281, 297, 512,  936,  0};
 
@@ -231,10 +235,6 @@ void print_board(const chess::Board& board) {
 }
 
 constexpr int nodespercheck = (1 << 11) - 1;
-
-constexpr int EXACT = 0;
-constexpr int UPPERBOUND = 1;
-constexpr int LOWERBOUND = -1;
 
 struct TTEntry {
     uint64_t key = 0;
