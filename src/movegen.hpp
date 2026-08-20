@@ -743,7 +743,6 @@ inline bool movegen::isEpSquareValid(const Board& board, Square ep) {
 }
 
 inline const std::array<std::array<Bitboard, 64>, 64> movegen::SQUARES_BETWEEN_BB = [] {
-    attacks::initAttacks();
     return movegen::init_squares_between();
 }();
 

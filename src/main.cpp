@@ -9,13 +9,6 @@ using namespace std;
 
 #define CHESS_USE_PEXT
 
-#define PAWN   0
-#define KNIGHT 1
-#define BISHOP 2
-#define ROOK   3
-#define QUEEN  4
-#define KING   5
-
 #define WHITE  0
 #define BLACK  1
 
@@ -188,7 +181,7 @@ int eg_table[12][64];
 void init_tables()
 {
     int pc, p, sq;
-    for (p = PAWN, pc = 0; p <= KING; pc++, p++) {
+    for (p = 0, pc = 0; p <= 5; pc++, p++) {
         for (sq = 0; sq < 64; sq++) {
             mg_table[pc]  [sq] = mg_value[p] + mg_pesto_table[p][sq];
             eg_table[pc]  [sq] = eg_value[p] + eg_pesto_table[p][sq];
@@ -221,13 +214,13 @@ int eval(const chess::Board& board)
 
     }
 
-    int mgScore = mg[board.sideToMove()] - mg[OTHER(board.sideToMove())];
-    int egScore = eg[board.sideToMove()] - eg[OTHER(board.sideToMove())];
+    int mgScore = mg[WHITE] - mg[BLACK];
+    int egScore = eg[WHITE] - eg[BLACK];
     int mgPhase = gamePhase;
     if (mgPhase > 24) mgPhase = 24;
     int egPhase = 24 - mgPhase;
     float eval = (mgScore * mgPhase + egScore * egPhase) / 24;
-    return (board.sideToMove() ? -eval : eval);
+    return eval;
 }
 
 void print_board(const chess::Board& board) {
@@ -293,8 +286,8 @@ constexpr float drawfactor = -0.1;
 
 constexpr float delta = 50;
 constexpr int R = 2;
-constexpr float LMR_Scaling = 3;
-constexpr float LMR_Base = 0;
+constexpr float LMR_Scale = 3;
+constexpr float LMR_Base = 1;
 
 constexpr int MAX_PLY = 128;
 
@@ -305,7 +298,7 @@ int LMRTable[128][255] = {0};
 void init_lmr() {
     for (int depth = 1; depth < 128; depth++) {
         for (int movecount = 1; movecount < 255; movecount++) {
-                LMRTable[depth][movecount] = std::round(LMR_Base + log(depth) * log(movecount) / LMR_Scaling);
+                LMRTable[depth][movecount] = std::round(LMR_Base + log(depth) * log(movecount) / LMR_Scale);
         }
     }
 }
@@ -490,6 +483,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
         float score;
 
         if (depth <= 0) {
+            nodecount--;
             return quiesce(quiesce, board, maximizingPlayer, alpha, beta);
         }
 
@@ -510,12 +504,12 @@ void search(chess::Board& board, int search_depth, int movetime) {
             if (depth > R && board.hasNonPawnMaterial(board.sideToMove())) {
                 board.makeNullMove();
                 if (maximizingPlayer) {
-                    score = self(self, depth - 1 - R, ply, beta - 1, beta, false);
+                    score = self(self, depth - 1 - R, ply + 1, beta - 1, beta, false);
                     board.unmakeNullMove();
                     if (score >= beta) return beta;
                 }
                 else {
-                    score = self(self, depth - 1 - R, ply, alpha, alpha + 1, true);
+                    score = self(self, depth - 1 - R, ply + 1, alpha, alpha + 1, true);
                     board.unmakeNullMove();
                     if (score <= alpha) return alpha;
                 }
@@ -572,7 +566,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 } else {
                     if (depth >= 3 && quietmove && !killermove && !incheck) {
                         int reduction = LMRTable[depth][i];
-                        score = self(self, depth - 1 - reduction, ply + 1, alpha, alpha + 1, false);
+                        score = self(self, depth - reduction, ply + 1, alpha, alpha + 1, false);
                     } else {
                         score = self(self, depth - 1, ply + 1, alpha, alpha + 1, false);
                     }
@@ -629,7 +623,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 } else {
                     if (depth >= 3 && quietmove && !killermove && !incheck) {
                         int reduction = LMRTable[depth][i];
-                        score = self(self, depth - 1 - reduction, ply + 1, beta - 1, beta, true);
+                        score = self(self, depth - reduction, ply + 1, beta - 1, beta, true);
                     } else {
                         score = self(self, depth - 1, ply + 1, beta - 1, beta, true);
                     }
@@ -786,7 +780,7 @@ int main() {
             break;
         }
     }
-    
+
     TTTable::free();
     return 0;
 }
