@@ -32,11 +32,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/attacks.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/attacks.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/attacks_fwd.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/attacks_fwd.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/movegen.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/movegen.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -306,7 +302,8 @@
       <workItem from="1786947148617" duration="965000" />
       <workItem from="1787028448858" duration="18393000" />
       <workItem from="1787112678860" duration="15721000" />
-      <workItem from="1787194219360" duration="15915000" />
+      <workItem from="1787194219360" duration="17617000" />
+      <workItem from="1787277606146" duration="17054000" />
     </task>
     <servers />
   </component>

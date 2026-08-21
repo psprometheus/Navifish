@@ -4,6 +4,8 @@
 #include <sstream>
 #include <chrono>
 #include <deque>
+#include <signal.h>
+
 #include "include.hpp"
 using namespace std;
 
@@ -288,6 +290,7 @@ constexpr float delta = 50;
 constexpr int R = 2;
 constexpr float LMR_Scale = 3;
 constexpr float LMR_Base = 1;
+constexpr int LMP_DEPTH = 2;
 
 constexpr int MAX_PLY = 128;
 
@@ -382,7 +385,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
     };
 
     auto quiesce = [&](auto&& self, chess::Board& board, bool maximizingPlayer, float alpha, float beta) -> float {
-        if ((++nodecount & nodespercheck) == 0) {
+        if ((nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
                 return 0;
@@ -424,6 +427,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
+                nodecount++;
                 float score = self(self, board, false, alpha, beta);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
@@ -443,6 +447,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
+                nodecount++;
                 float score = self(self, board, true, alpha, beta);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
@@ -457,7 +462,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
     };
 
     auto minimax = [&](auto&& self, int depth, int ply, float alpha, float beta, bool maximizingPlayer) -> float {
-        if ((++nodecount & nodespercheck) == 0) {
+        if ((nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
                 return 0;
@@ -483,7 +488,6 @@ void search(chess::Board& board, int search_depth, int movetime) {
         float score;
 
         if (depth <= 0) {
-            nodecount--;
             return quiesce(quiesce, board, maximizingPlayer, alpha, beta);
         }
 
@@ -553,18 +557,18 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 }
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
-                bool quietmove = silence_move(board, next_move);
-                if (depth <= 2) {
-                    if (quietmove && !incheck && nonpvnode) {
-                        if (++quietsearched > lmp_limit) continue;
-                    }
+                bool quietmove = next_move.score() < CaptureBase;
+                if (quietmove) quietsearched++;
+                if (depth <= LMP_DEPTH && !incheck && nonpvnode) {
+                    if (quietsearched > lmp_limit) break;
                 }
                 bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
                 board.makeMove(next_move);
+                nodecount++;
                 if (i == 0) {
                     score = self(self, depth - 1, ply + 1, alpha, beta, false);
                 } else {
-                    if (depth >= 3 && quietmove && !killermove && !incheck) {
+                    if (depth >= 3 && quietmove && !incheck) {
                         int reduction = LMRTable[depth][i];
                         score = self(self, depth - reduction, ply + 1, alpha, alpha + 1, false);
                     } else {
@@ -610,18 +614,18 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 }
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
-                bool quietmove = silence_move(board, next_move);
-                if (depth <= 2) {
-                    if (quietmove && !incheck && nonpvnode) {
-                        if (++quietsearched > lmp_limit) continue;
-                    }
+                bool quietmove = next_move.score() < CaptureBase;
+                if (quietmove) quietsearched++;
+                if (depth <= LMP_DEPTH && !incheck && nonpvnode) {
+                    if (quietsearched > lmp_limit) break;
                 }
                 bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
                 board.makeMove(next_move);
+                nodecount++;
                 if (i == 0) {
                     score = self(self, depth - 1, ply + 1, alpha, beta, true);
                 } else {
-                    if (depth >= 3 && quietmove && !killermove && !incheck) {
+                    if (depth >= 3 && quietmove && !incheck) {
                         int reduction = LMRTable[depth][i];
                         score = self(self, depth - reduction, ply + 1, beta - 1, beta, true);
                     } else {
