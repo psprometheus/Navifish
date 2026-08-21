@@ -290,7 +290,7 @@ constexpr float delta = 50;
 constexpr int R = 2;
 constexpr float LMR_Scale = 3;
 constexpr float LMR_Base = 1;
-constexpr int LMP_DEPTH = 2;
+constexpr int LMP_DEPTH = 3;
 
 constexpr int MAX_PLY = 128;
 
@@ -534,7 +534,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         chess::Move bestmoveply = movelist[0];
 
-        int lmp_limit = 5 + 2 * depth * depth;
+        int lmp_limit = 4 + depth * depth;
 
         int quietsearched = 0;
 
