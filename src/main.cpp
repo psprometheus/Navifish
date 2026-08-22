@@ -250,6 +250,7 @@ public:
         uint64_t hash = board.hash();
         size_t index = hash & (slots - 1);
         TTEntry& entry = data[index];
+        if (entry.key == 0) ++used;
         entry.key = hash;
         entry.eval = eval;
         entry.bestmove = bestmove;
@@ -265,6 +266,9 @@ public:
         else
             return chess::Move::NO_MOVE;
     }
+    static int hashfull() {
+        return 1000 * float(used) / slots;
+    }
     static void free() {
         delete[] data;
     }
@@ -272,6 +276,7 @@ public:
 private:
     inline static const size_t slots = (1 << 20);
     inline static TTEntry* data = new TTEntry[slots];
+    inline static size_t used = 0;
 };
 
 bool silence_move(chess::Board& board, const chess::Move& move) {
@@ -293,6 +298,7 @@ constexpr float LMR_Base = 1;
 constexpr int LMP_DEPTH = 3;
 
 constexpr int MAX_PLY = 128;
+constexpr int QSEARCH_DEPTH_GUARD = 32;
 
 chess::Move KillerMoves[MAX_PLY][2];
 
@@ -374,6 +380,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
     auto start = chrono::high_resolution_clock::now();
     uint64_t nodecount = 0;
     int currentDepth = 1;
+    int seldepth = 0;
     bool stop = 0;
     vector<chess::Move> pv;
     chess::Move pvmove;
@@ -384,13 +391,14 @@ void search(chess::Board& board, int search_depth, int movetime) {
         return (movetime - duration <= 30);
     };
 
-    auto quiesce = [&](auto&& self, chess::Board& board, bool maximizingPlayer, float alpha, float beta) -> float {
+    auto quiesce = [&](auto&& self, chess::Board& board, float alpha, float beta, bool maximizingPlayer, int qply, const int& leafnode_ply) -> float {
         if ((nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
                 return 0;
             }
         }
+        seldepth = max(seldepth, qply + leafnode_ply + 1);
         float best_value;
         bool incheck = board.inCheck();
         chess::Movelist movelist;
@@ -428,7 +436,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
                 nodecount++;
-                float score = self(self, board, false, alpha, beta);
+                float score = self(self, board, alpha, beta, false, qply + 1, leafnode_ply);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
                 if (best_value < score) {
@@ -448,7 +456,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
                 nodecount++;
-                float score = self(self, board, true, alpha, beta);
+                float score = self(self, board, alpha, beta, true, qply + 1, leafnode_ply);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
                 if (best_value > score) {
@@ -488,7 +496,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
         float score;
 
         if (depth <= 0) {
-            return quiesce(quiesce, board, maximizingPlayer, alpha, beta);
+            return quiesce(quiesce, board, alpha, beta, maximizingPlayer, 0, ply);
         }
 
         float static_eval = eval(board);
@@ -674,6 +682,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
         float alpha = -INFINITY; float beta = INFINITY;
         bool fail = 1;
         int k = 0;
+        seldepth = 0;
         while (fail) {
             k++;
             if (currentDepth > 1 && abs(last_eval) < INFINITY) {
@@ -721,7 +730,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
             pv.pop_back();
         }
 
-        cout << "info depth " << currentDepth << " score " << score << " nodes " << nodecount << " time " << time << " pv " << pvstring << endl;
+        int nps = nodecount / (max(float(time), 0.5f) / 1000.0f);
+
+        cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << score << " nodes " << nodecount << " time " << time << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << pvstring << endl;
 
         if (currentDepth++ >= search_depth || time >= movetime) stop = 1;
     }
