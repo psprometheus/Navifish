@@ -293,7 +293,8 @@ constexpr int MAX_PLY = 128;
 chess::Move PVTable[MAX_PLY][MAX_PLY];
 uint8_t PVSize[MAX_PLY];
 
-constexpr int contemp_factor = 15;
+constexpr int CONTEMPT_FACTOR = 15;
+constexpr int MATE_BASE = 100000;
 
 constexpr float delta = 50;
 constexpr int R = 2;
@@ -417,14 +418,16 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 return 0;
             }
         }
-        seldepth = max(seldepth, qply + leafnode_ply + 1);
+        int ply = qply + leafnode_ply;
+        seldepth = max(seldepth, ply);
         float best_value;
         bool incheck = board.inCheck();
         chess::Movelist movelist;
         if (incheck) {
             chess::movegen::legalmoves(movelist, board);
-            if (movelist.empty())
-                return (board.sideToMove() ? INFINITY : -INFINITY);
+            if (movelist.empty()) {
+                return (board.sideToMove() ? (MATE_BASE - ply) : -(MATE_BASE - ply));
+            }
         } else {
             chess::movegen::legalmoves<chess::movegen::MoveGenType::CAPTURE>(movelist, board);
         }
@@ -497,13 +500,13 @@ void search(chess::Board& board, int search_depth, int movetime) {
         }
         PVSize[ply] = 0;
         if (board.isRepetition() || board.isInsufficientMaterial()) {
-            return (board.sideToMove() ? -contemp_factor : contemp_factor);
+            return (board.sideToMove() ? -CONTEMPT_FACTOR : CONTEMPT_FACTOR);
         }
         if (board.isHalfMoveDraw()) {
             if (board.getHalfMoveDrawType().first == chess::GameResultReason::CHECKMATE)
-                return (board.sideToMove() ? INFINITY : -INFINITY);
+                return (board.sideToMove() ? (MATE_BASE - ply) : -(MATE_BASE - ply));
             else
-                return (board.sideToMove() ? -contemp_factor : contemp_factor);
+                return (board.sideToMove() ? -CONTEMPT_FACTOR : CONTEMPT_FACTOR);
         }
         bool incheck = board.inCheck();
         TTEntry entry = TTTable::get(board);
@@ -553,9 +556,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
         chess::movegen::legalmoves(movelist, board);
         if (movelist.empty()) {
             if (incheck)
-                return (board.sideToMove() ? INFINITY : -INFINITY);
+                return (board.sideToMove() ? (MATE_BASE - ply) : -(MATE_BASE - ply));
             else
-                return (board.sideToMove() ? -contemp_factor : contemp_factor);
+                return (board.sideToMove() ? -CONTEMPT_FACTOR : CONTEMPT_FACTOR);
         }
 
         chess::Move bestmove = movelist[0];
@@ -721,13 +724,11 @@ void search(chess::Board& board, int search_depth, int movetime) {
         int time = chrono::duration_cast<chrono::milliseconds>(untilnow - start).count();
         last_eval = root_eval;
         bestmove = PVTable[0][0];
-        if (root_eval == INFINITY) {
-            if (board.sideToMove()) score = "mate " + to_string(-currentDepth);
-            else score = "mate " + to_string(currentDepth);
-            stop = 1;
-        } else if (root_eval == -INFINITY) {
-            if (board.sideToMove()) score = "mate " + to_string(currentDepth);
-            else score = "mate " + to_string(-currentDepth);
+        if (abs(root_eval) > MATE_BASE - MAX_PLY) {
+            cout << root_eval << endl;
+            bool side2Mate = !(root_eval > 0);
+            int distanceToMate = (side2Mate == board.sideToMove() ? MATE_BASE - abs(root_eval) : abs(root_eval) - MATE_BASE);
+            score = "mate " + to_string(distanceToMate);
             stop = 1;
         } else {
             score = "cp " + to_string((int)root_eval);
