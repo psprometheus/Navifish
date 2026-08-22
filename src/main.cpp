@@ -213,7 +213,6 @@ int eval(const chess::Board& board)
         mg[piece.color()] += mg_table[piece][FLIP(sq)];
         eg[piece.color()] += eg_table[piece][FLIP(sq)];
         gamePhase += gamephaseInc[piece];
-
     }
 
     int mgScore = mg[WHITE] - mg[BLACK];
@@ -294,7 +293,7 @@ constexpr int MAX_PLY = 128;
 chess::Move PVTable[MAX_PLY][MAX_PLY];
 uint8_t PVSize[MAX_PLY];
 
-constexpr float drawfactor = -0.1;
+constexpr int contemp_factor = 15;
 
 constexpr float delta = 50;
 constexpr int R = 2;
@@ -496,25 +495,25 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 return 0;
             }
         }
+        PVSize[ply] = 0;
         if (board.isRepetition() || board.isInsufficientMaterial()) {
-            return drawfactor;
+            return (board.sideToMove() ? -contemp_factor : contemp_factor);
         }
         if (board.isHalfMoveDraw()) {
             if (board.getHalfMoveDrawType().first == chess::GameResultReason::CHECKMATE)
                 return (board.sideToMove() ? INFINITY : -INFINITY);
             else
-                return drawfactor;
+                return (board.sideToMove() ? -contemp_factor : contemp_factor);
         }
         bool incheck = board.inCheck();
         TTEntry entry = TTTable::get(board);
-        if (entry.key == board.hash() && entry.depth >= depth && !incheck) {
+        if (ply > 0 && entry.key == board.hash() && entry.depth >= depth) {
             if (entry.flag == EXACT) return entry.eval;
             if (entry.flag == LOWERBOUND && entry.eval >= beta) return entry.eval;
             if (entry.flag == UPPERBOUND && entry.eval <= alpha) return entry.eval;
         }
 
         if (depth <= 0) {
-            PVSize[ply] = 0;
             leafnode_ply = ply;
             return quiesce(quiesce, board, alpha, beta, maximizingPlayer, 0);
         }
@@ -556,7 +555,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
             if (incheck)
                 return (board.sideToMove() ? INFINITY : -INFINITY);
             else
-                return drawfactor;
+                return (board.sideToMove() ? -contemp_factor : contemp_factor);
         }
 
         chess::Move bestmove = movelist[0];
@@ -721,8 +720,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
         auto untilnow = chrono::high_resolution_clock::now();
         int time = chrono::duration_cast<chrono::milliseconds>(untilnow - start).count();
         last_eval = root_eval;
-        TTEntry entry = TTTable::get(board);
-        bestmove = entry.bestmove;
+        bestmove = PVTable[0][0];
         if (root_eval == INFINITY) {
             if (board.sideToMove()) score = "mate " + to_string(-currentDepth);
             else score = "mate " + to_string(currentDepth);
@@ -733,7 +731,6 @@ void search(chess::Board& board, int search_depth, int movetime) {
             stop = 1;
         } else {
             score = "cp " + to_string((int)root_eval);
-            if (root_eval == drawfactor) stop = 1;
         }
 
         pvmove = bestmove;
