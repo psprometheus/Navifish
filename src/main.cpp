@@ -289,6 +289,11 @@ bool silence_move(chess::Board& board, const chess::Move& move) {
     return 1;
 }
 
+constexpr int MAX_PLY = 128;
+
+chess::Move PVTable[MAX_PLY][MAX_PLY];
+uint8_t PVSize[MAX_PLY];
+
 constexpr float drawfactor = -0.1;
 
 constexpr float delta = 50;
@@ -296,8 +301,6 @@ constexpr int R = 2;
 constexpr float LMR_Scale = 3;
 constexpr float LMR_Base = 1;
 constexpr int LMP_DEPTH = 3;
-
-constexpr int MAX_PLY = 128;
 
 chess::Move KillerMoves[MAX_PLY][2];
 
@@ -375,13 +378,29 @@ void move_valuing(chess::Movelist& movelist, chess::Board& board, const chess::M
     }
 }
 
+void PVCopy(const chess::Move& bestmove, int ply) {
+    PVTable[ply][0] = bestmove;
+    size_t child_pv_size = PVSize[ply + 1];
+    memcpy(&PVTable[ply][1], &PVTable[ply + 1][0], child_pv_size * 4);
+    PVSize[ply] = child_pv_size + 1;
+}
+
+char PrintPV() {
+    size_t pv_size = PVSize[0];
+    for (int i = 0; i < pv_size; i++) {
+        chess::Move move = PVTable[0][i];
+        cout << chess::uci::moveToUci(move) << " ";
+    }
+    return '\n';
+}
+
 void search(chess::Board& board, int search_depth, int movetime) {
     auto start = chrono::high_resolution_clock::now();
     uint64_t nodecount = 0;
     int currentDepth = 1;
     int seldepth = 0;
     bool stop = 0;
-    vector<chess::Move> pv;
+    int leafnode_ply;
     chess::Move pvmove;
 
     auto checktime = [&]() -> bool {
@@ -392,7 +411,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
     chess::Movelist movelists[MAX_PLY];
 
-    auto quiesce = [&](auto&& self, chess::Board& board, float alpha, float beta, bool maximizingPlayer, int qply, const int& leafnode_ply) -> float {
+    auto quiesce = [&](auto&& self, chess::Board& board, float alpha, float beta, bool maximizingPlayer, int qply) -> float {
         if ((nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
@@ -437,7 +456,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
                 nodecount++;
-                float score = self(self, board, alpha, beta, false, qply + 1, leafnode_ply);
+                float score = self(self, board, alpha, beta, false, qply + 1);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
                 if (best_value < score) {
@@ -457,7 +476,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
                 nodecount++;
-                float score = self(self, board, alpha, beta, true, qply + 1, leafnode_ply);
+                float score = self(self, board, alpha, beta, true, qply + 1);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
                 if (best_value > score) {
@@ -495,7 +514,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
         }
 
         if (depth <= 0) {
-            return quiesce(quiesce, board, alpha, beta, maximizingPlayer, 0, ply);
+            PVSize[ply] = 0;
+            leafnode_ply = ply;
+            return quiesce(quiesce, board, alpha, beta, maximizingPlayer, 0);
         }
 
         float score;
@@ -538,7 +559,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 return drawfactor;
         }
 
-        chess::Move bestmoveply = movelist[0];
+        chess::Move bestmove = movelist[0];
 
         int lmp_limit = 4 + depth * depth;
 
@@ -587,11 +608,12 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 if (stop) return 0;
                 if (maxEval < score) {
                     maxEval = score;
-                    bestmoveply = next_move;
+                    bestmove = next_move;
+                    PVCopy(bestmove, ply);
                 }
                 alpha = max(alpha, score);
                 if (alpha >= beta) {
-                    TTTable::add(board, maxEval, bestmoveply, depth, LOWERBOUND);
+                    TTTable::add(board, maxEval, bestmove, depth, LOWERBOUND);
                     if (quietmove) {
                         if (KillerMoves[ply][0] != next_move) {
                             KillerMoves[ply][1] = KillerMoves[ply][0];
@@ -605,9 +627,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
             }
 
             if (maxEval <= original_alpha)
-                TTTable::add(board, maxEval, bestmoveply, depth, UPPERBOUND);
+                TTTable::add(board, maxEval, bestmove, depth, UPPERBOUND);
             else
-                TTTable::add(board, maxEval, bestmoveply, depth, EXACT);
+                TTTable::add(board, maxEval, bestmove, depth, EXACT);
 
             return maxEval;
         } else {
@@ -645,11 +667,12 @@ void search(chess::Board& board, int search_depth, int movetime) {
                 if (stop) return 0;
                 if (minEval > score) {
                     minEval = score;
-                    bestmoveply = next_move;
+                    bestmove = next_move;
+                    PVCopy(bestmove, ply);
                 }
                 beta = min(beta, score);
                 if (alpha >= beta) {
-                    TTTable::add(board, minEval, bestmoveply, depth, UPPERBOUND);
+                    TTTable::add(board, minEval, bestmove, depth, UPPERBOUND);
                     if (quietmove) {
                         if (KillerMoves[ply][0] != next_move) {
                             KillerMoves[ply][1] = KillerMoves[ply][0];
@@ -663,9 +686,9 @@ void search(chess::Board& board, int search_depth, int movetime) {
             }
 
             if (minEval >= original_beta)
-                TTTable::add(board, minEval, bestmoveply, depth, LOWERBOUND);
+                TTTable::add(board, minEval, bestmove, depth, LOWERBOUND);
             else
-                TTTable::add(board, minEval, bestmoveply, depth, EXACT);
+                TTTable::add(board, minEval, bestmove, depth, EXACT);
 
             return minEval;
         }
@@ -713,26 +736,11 @@ void search(chess::Board& board, int search_depth, int movetime) {
             if (root_eval == drawfactor) stop = 1;
         }
 
-        for (int m = 0; m < currentDepth; m++) {
-            chess::Move nextpv = TTTable::get_bestmove(board);
-            if (nextpv == chess::Move::NO_MOVE) break;
-            pvstring += chess::uci::moveToUci(nextpv) + " ";
-            board.makeMove(nextpv);
-            pv.push_back(nextpv);
-        }
-
         pvmove = bestmove;
-
-        int pvsize = pv.size();
-
-        for (int n = 0; n < pvsize; n++) {
-            board.unmakeMove(pv.back());
-            pv.pop_back();
-        }
 
         int nps = nodecount / (max(float(time), 0.5f) / 1000.0f);
 
-        cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << score << " nodes " << nodecount << " time " << time << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << pvstring << endl;
+        cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << score << " nodes " << nodecount << " time " << time << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << PrintPV();
 
         if (currentDepth++ >= search_depth || time >= movetime) stop = 1;
     }
