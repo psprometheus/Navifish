@@ -298,7 +298,6 @@ constexpr float LMR_Base = 1;
 constexpr int LMP_DEPTH = 3;
 
 constexpr int MAX_PLY = 128;
-constexpr int QSEARCH_DEPTH_GUARD = 32;
 
 chess::Move KillerMoves[MAX_PLY][2];
 
@@ -390,6 +389,8 @@ void search(chess::Board& board, int search_depth, int movetime) {
         int duration = chrono::duration_cast<chrono::milliseconds>(now - start).count();
         return (movetime - duration <= 30);
     };
+
+    chess::Movelist movelists[MAX_PLY];
 
     auto quiesce = [&](auto&& self, chess::Board& board, float alpha, float beta, bool maximizingPlayer, int qply, const int& leafnode_ply) -> float {
         if ((nodecount & nodespercheck) == 0) {
@@ -493,11 +494,11 @@ void search(chess::Board& board, int search_depth, int movetime) {
             if (entry.flag == UPPERBOUND && entry.eval <= alpha) return entry.eval;
         }
 
-        float score;
-
         if (depth <= 0) {
             return quiesce(quiesce, board, alpha, beta, maximizingPlayer, 0, ply);
         }
+
+        float score;
 
         float static_eval = eval(board);
 
@@ -528,10 +529,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
             }
         }
 
-        float original_alpha = alpha;
-        float original_beta = beta;
-
-        chess::Movelist movelist;
+        chess::Movelist& movelist = movelists[ply];
         chess::movegen::legalmoves(movelist, board);
         if (movelist.empty()) {
             if (incheck)
@@ -556,6 +554,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
 
         if (maximizingPlayer) {
             //bool fp_prune = (static_eval + fp_margin <= alpha);
+            float original_alpha = alpha;
             float maxEval = -INFINITY;
             for (int i = 0; i < movelist.size(); i++) {
                 int best_index = i;
@@ -613,6 +612,7 @@ void search(chess::Board& board, int search_depth, int movetime) {
             return maxEval;
         } else {
             //bool fp_prune = (static_eval - fp_margin >= beta);
+            float original_beta = beta;
             float minEval = INFINITY;
             for (int i = 0; i < movelist.size(); i++) {
                 int best_index = i;
