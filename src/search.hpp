@@ -12,7 +12,7 @@ const int MAX_PLY = 128;
 const int CONTEMPT_FACTOR = 15;
 const int MATE_BASE = 100000;
 
-const float delta = 50;
+const float delta = 25;
 const int R = 2;
 const float LMR_Scale = 3;
 const float LMR_Base = 1;
@@ -126,30 +126,36 @@ struct PVTable {
 
 class Search {
 public:
-    Search(chess::Board& b, int search_depth, int movetime) : board(b), movetime(movetime) {
+    Search(chess::Board& brd, int search_depth, int movetime) : movetime(movetime), board(brd) {
         rootMaximizing = !static_cast<bool>(board.sideToMove());
         float root_eval, last_eval;
         chess::Move bestmove;
         while (!stop) {
-            string score, pvstring;
             float alpha = -INFINITY; float beta = INFINITY;
             bool fail = 1;
-            int k = 0;
+            int a{1}, b{1};
             seldepth = 0;
             while (fail) {
-                k++;
                 if (currentDepth > 1 && abs(last_eval) < INFINITY) {
-                    alpha = last_eval - k * delta;
-                    beta = last_eval + k * delta;
+                    alpha = last_eval - a * delta;
+                    beta = last_eval + b * delta;
                 }
                 root_eval = minimax(currentDepth, 0, alpha, beta, rootMaximizing);
                 if (stop) break;
                 if (root_eval == INFINITY || root_eval == -INFINITY) break;
-                fail = !(root_eval > alpha && root_eval < beta);
+                if (root_eval < alpha) {
+                    score = "cp " + to_string((int)root_eval) + " upperbound";
+                    log_uci_info_string();
+                    a += 3;
+                } else if (root_eval > beta) {
+                    score = "cp " + to_string((int)root_eval) + " lowerbound";
+                    log_uci_info_string();
+                    b += 3;
+                } else {
+                    fail = 0;
+                }
             }
             if (stop) break;
-            auto untilnow = chrono::high_resolution_clock::now();
-            int time = chrono::duration_cast<chrono::milliseconds>(untilnow - start).count();
             last_eval = root_eval;
             bestmove = PVTable::data[0][0];
             if (abs(root_eval) > MATE_BASE - MAX_PLY) {
@@ -164,11 +170,9 @@ public:
 
             pvmove = bestmove;
 
-            int nps = nodecount / (max(float(time), 0.5f) / 1000.0f);
+            log_uci_info_string();
 
-            cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << score << " nodes " << nodecount << " time " << time << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << PVTable::print();
-
-            if (currentDepth++ >= search_depth || time >= movetime) stop = 1;
+            if (currentDepth++ >= search_depth) stop = 1;
         }
         cout << "bestmove " << chess::uci::moveToUci(bestmove) << endl;
     }
@@ -468,6 +472,16 @@ public:
     }
 
 private:
+
+    void log_uci_info_string() {
+        auto untilnow = chrono::high_resolution_clock::now();
+        int time = chrono::duration_cast<chrono::microseconds>(untilnow - start).count();
+        float time_milli = time / 1000.0f;
+        int nps = nodecount / (time_milli / 1000.0f);
+        cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << score << " nodes " << nodecount << " time " << int(time_milli) << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << PVTable::print();
+        if (movetime - time_milli <= 30) stop = 1;
+    }
+
     const int movetime;
     chrono::time_point<chrono::system_clock, chrono::system_clock::duration> start = chrono::high_resolution_clock::now();
     chess::Movelist movelists[MAX_PLY];
@@ -479,4 +493,5 @@ private:
     int leafnode_ply;
     chess::Move pvmove;
     bool rootMaximizing;
+    string score;
 };

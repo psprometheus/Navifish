@@ -56,12 +56,15 @@ int main() {
             if (command == "fen") {
                 string fen;
                 while (ss >> command) {
+                    if (command == "moves") break;
                     fen += command + " ";
                 }
                 board.setFen(fen);
             } else if (command == "startpos") {
                 board = chess::Board();
                 ss >> command;
+            }
+            if (command == "moves") {
                 while (ss >> command) {
                     chess::Move move = chess::uci::uciToMove(board, command);
                     board.makeMove(move);
