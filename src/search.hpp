@@ -73,11 +73,13 @@ inline bool silence_move(chess::Board& board, const chess::Move& move) {
     return 1;
 }
 
-inline void move_valuing(chess::Movelist& movelist, chess::Board& board, const chess::Move& pvmove, int depth = 0, int ply = MAX_PLY - 1) {
+inline bool move_valuing(chess::Movelist& movelist, chess::Board& board, const chess::Move& pvmove, int depth = 0, int ply = MAX_PLY - 1) {
+    bool ttMoveExists = 0;
     chess::Move ttmove = TTTable::get_bestmove(board, depth);
     for (int i = 0; i < movelist.size(); i++) {
         chess::Move& move = movelist[i];
         if (move == ttmove) {
+            ttMoveExists = 1;
             move.setScore(TTMoveScore);
             continue;
         }
@@ -106,6 +108,7 @@ inline void move_valuing(chess::Movelist& movelist, chess::Board& board, const c
             move.setScore(CaptureBase + score);
         }
     }
+    return ttMoveExists;
 }
 
 struct PVTable {
@@ -347,11 +350,15 @@ public:
 
         int quietsearched = 0;
 
+        bool ttMoveExists;
+
         if (ply == 0) {
-            move_valuing(movelist, board, pvmove, depth, ply);
+            ttMoveExists = move_valuing(movelist, board, pvmove, depth, ply);
         } else {
-            move_valuing(movelist, board, chess::Move::NO_MOVE, depth, ply);
+            ttMoveExists = move_valuing(movelist, board, chess::Move::NO_MOVE, depth, ply);
         }
+
+        if (depth > 9 && !ttMoveExists) depth--;
 
         //NOTE FOR ME: THERE'S A PROBLEM IN HISTORY HEURISTIC, WHERE MOVES ARE REGARDED AS QUIET IF ITS SCORE IS LOWER THAN CAPTURE BASE
         //HOWEVER, ON CHESSPROGRAMMINGWIKI, WRITING A MOVE TO HISTORY IS NOT NECESSARY 'QUIET', IS NON CAPTURE MOVE
