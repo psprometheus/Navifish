@@ -39,7 +39,7 @@ public:
         size_t index = hash & (slots - 1);
         TTEntry& entry = data[index];
         if (entry.key == hash && entry.depth >= depth)
-            return entry.bestmove;
+            return chess::Move(entry.bestmove);
         else
             return chess::Move::NO_MOVE;
     }

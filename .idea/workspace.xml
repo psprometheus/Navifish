@@ -30,11 +30,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/search.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/search.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tt.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/tt.hpp" afterDir="false" />
-    </list>
+    <list default="true" id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -309,7 +305,7 @@
       <workItem from="1787450942078" duration="23346000" />
       <workItem from="1787528597969" duration="28698000" />
       <workItem from="1787583373340" duration="2326000" />
-      <workItem from="1787635144551" duration="14300000" />
+      <workItem from="1787635144551" duration="14624000" />
     </task>
     <task id="LOCAL-00001" summary="make rfp more aggresive (100 * depth)">
       <option name="closed" value="true" />
