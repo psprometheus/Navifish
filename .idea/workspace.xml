@@ -32,7 +32,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/eval.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/search.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/search.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -155,7 +155,7 @@
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/creper/TexelTuner&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/creper/Navifish&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -307,7 +307,9 @@
       <workItem from="1787277606146" duration="19076000" />
       <workItem from="1787363489511" duration="23993000" />
       <workItem from="1787450942078" duration="23346000" />
-      <workItem from="1787528597969" duration="3085000" />
+      <workItem from="1787528597969" duration="28698000" />
+      <workItem from="1787583373340" duration="2326000" />
+      <workItem from="1787635144551" duration="1938000" />
     </task>
     <servers />
   </component>

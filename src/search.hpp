@@ -13,10 +13,12 @@ const int CONTEMPT_FACTOR = 15;
 const int MATE_BASE = 100000;
 
 const float delta = 25;
-const int R = 2;
+const int R = 3;
 const float LMR_Scale = 3;
 const float LMR_Base = 1;
 const int LMP_DEPTH = 3;
+
+const int FP_DEPTH = 4;
 
 const int16_t TTMoveScore = 32767;
 const int16_t PVMoveScore = 32766;
@@ -136,19 +138,19 @@ public:
             int a{1}, b{1};
             seldepth = 0;
             while (fail) {
-                if (currentDepth > 1 && abs(last_eval) < INFINITY) {
+                if (currentDepth > 1 && abs(last_eval) <= MATE_BASE - MAX_PLY) {
                     alpha = last_eval - a * delta;
                     beta = last_eval + b * delta;
                 }
                 root_eval = minimax(currentDepth, 0, alpha, beta, rootMaximizing);
                 if (stop) break;
-                if (root_eval == INFINITY || root_eval == -INFINITY) break;
+                if (abs(root_eval) > MATE_BASE - MAX_PLY) break;
                 if (root_eval < alpha) {
-                    score = "cp " + to_string((int)root_eval) + " upperbound";
+                    scoreuci = "cp " + to_string((int)root_eval) + " upperbound";
                     log_uci_info_string();
                     a += 3;
                 } else if (root_eval > beta) {
-                    score = "cp " + to_string((int)root_eval) + " lowerbound";
+                    scoreuci = "cp " + to_string((int)root_eval) + " lowerbound";
                     log_uci_info_string();
                     b += 3;
                 } else {
@@ -159,13 +161,12 @@ public:
             last_eval = root_eval;
             bestmove = PVTable::data[0][0];
             if (abs(root_eval) > MATE_BASE - MAX_PLY) {
-                cout << root_eval << endl;
                 bool side2Mate = !(root_eval > 0);
                 int distanceToMate = (side2Mate == board.sideToMove() ? MATE_BASE - abs(root_eval) : abs(root_eval) - MATE_BASE);
-                score = "mate " + to_string(distanceToMate);
+                scoreuci = "mate " + to_string(distanceToMate);
                 stop = 1;
             } else {
-                score = "cp " + to_string((int)root_eval);
+                scoreuci = "cp " + to_string((int)root_eval);
             }
 
             pvmove = bestmove;
@@ -299,25 +300,32 @@ public:
 
         bool nonpvnode = (beta - alpha == 1);
 
-        if (!incheck && nonpvnode) {
-            float margin = 150 * depth;
+        bool basic_pruning_condition = !incheck && nonpvnode;
+
+        bool allow_futility_pruning = 0;
+
+        if (basic_pruning_condition) {
+            int rfp_margin = 150 * depth;
+            int fp_margin = 85 * depth + 45;
             if (maximizingPlayer) {
-                if (static_eval - margin >= beta)
+                allow_futility_pruning = depth <= FP_DEPTH && static_eval + fp_margin <= alpha;
+                if (static_eval - rfp_margin >= beta)
                     return static_eval;
             } else {
-                if (static_eval + margin <= alpha) {
+                allow_futility_pruning = depth <= FP_DEPTH && static_eval - fp_margin >= beta;
+                if (static_eval + rfp_margin <= alpha) {
                     return static_eval;
                 }
             }
-            if (depth > R && board.hasNonPawnMaterial(board.sideToMove())) {
+            if (depth >= R && board.hasNonPawnMaterial(board.sideToMove())) {
                 board.makeNullMove();
                 if (maximizingPlayer) {
-                    score = minimax(depth - 1 - R, ply + 1, alpha, beta, false);
+                    score = minimax(depth - R, ply + 1, alpha, beta, false);
                     board.unmakeNullMove();
                     if (score >= beta) return beta;
                 }
                 else {
-                    score = minimax(depth - 1 - R, ply + 1, alpha, beta, true);
+                    score = minimax(depth - R, ply + 1, alpha, beta, true);
                     board.unmakeNullMove();
                     if (score <= alpha) return alpha;
                 }
@@ -348,10 +356,7 @@ public:
         //NOTE FOR ME: THERE'S A PROBLEM IN HISTORY HEURISTIC, WHERE MOVES ARE REGARDED AS QUIET IF ITS SCORE IS LOWER THAN CAPTURE BASE
         //HOWEVER, ON CHESSPROGRAMMINGWIKI, WRITING A MOVE TO HISTORY IS NOT NECESSARY 'QUIET', IS NON CAPTURE MOVE
 
-        //float fp_margin = depth * 150;
-
         if (maximizingPlayer) {
-            //bool fp_prune = (static_eval + fp_margin <= alpha);
             float original_alpha = alpha;
             float maxEval = -INFINITY;
             for (int i = 0; i < movelist.size(); i++) {
@@ -363,11 +368,14 @@ public:
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
                 bool quietmove = next_move.score() < CaptureBase;
-                if (quietmove) quietsearched++;
-                if (depth <= LMP_DEPTH && !incheck && nonpvnode) {
+                if (quietmove) {
+                    if (allow_futility_pruning && maxEval > -INFINITY) break;
+                    quietsearched++;
+                }
+                if (depth <= LMP_DEPTH && basic_pruning_condition) {
                     if (quietsearched > lmp_limit) break;
                 }
-                bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
+                //bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
                 board.makeMove(next_move);
                 nodecount++;
                 if (i == 0) {
@@ -410,7 +418,6 @@ public:
 
             return maxEval;
         } else {
-            //bool fp_prune = (static_eval - fp_margin >= beta);
             float original_beta = beta;
             float minEval = INFINITY;
             for (int i = 0; i < movelist.size(); i++) {
@@ -422,11 +429,14 @@ public:
                 swap(movelist[best_index], movelist[i]);
                 chess::Move next_move = movelist[i];
                 bool quietmove = next_move.score() < CaptureBase;
-                if (quietmove) quietsearched++;
-                if (depth <= LMP_DEPTH && !incheck && nonpvnode) {
+                if (quietmove) {
+                    if (allow_futility_pruning && minEval < INFINITY) break;
+                    quietsearched++;
+                }
+                if (depth <= LMP_DEPTH && basic_pruning_condition) {
                     if (quietsearched > lmp_limit) break;
                 }
-                bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
+                //bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
                 board.makeMove(next_move);
                 nodecount++;
                 if (i == 0) {
@@ -478,7 +488,7 @@ private:
         int time = chrono::duration_cast<chrono::microseconds>(untilnow - start).count();
         float time_milli = time / 1000.0f;
         int nps = nodecount / (time_milli / 1000.0f);
-        cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << score << " nodes " << nodecount << " time " << int(time_milli) << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << PVTable::print();
+        cout << "info depth " << currentDepth << " seldepth " << seldepth << " score " << scoreuci << " nodes " << nodecount << " time " << int(time_milli) << " nps " << nps << " hashfull " << TTTable::hashfull() << " pv " << PVTable::print();
         if (movetime - time_milli <= 30) stop = 1;
     }
 
@@ -493,5 +503,5 @@ private:
     int leafnode_ply;
     chess::Move pvmove;
     bool rootMaximizing;
-    string score;
+    string scoreuci;
 };
