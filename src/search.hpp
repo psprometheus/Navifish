@@ -10,7 +10,7 @@ using namespace std;
 
 const int MAX_PLY = 128;
 const int CONTEMPT_FACTOR = 15;
-const int MATE_BASE = 100000;
+const int MATE_BASE = INT16_MAX;
 
 const float delta = 25;
 const int R = 3;
@@ -133,10 +133,10 @@ class Search {
 public:
     Search(chess::Board& brd, int search_depth, int movetime) : movetime(movetime), board(brd) {
         rootMaximizing = !static_cast<bool>(board.sideToMove());
-        float root_eval, last_eval;
+        int root_eval, last_eval;
         chess::Move bestmove;
         while (!stop) {
-            float alpha = -INFINITY; float beta = INFINITY;
+            int alpha = INT_MIN; int beta = INT_MAX;
             bool fail = 1;
             int a{1}, b{1};
             seldepth = 0;
@@ -149,11 +149,11 @@ public:
                 if (stop) break;
                 if (abs(root_eval) > MATE_BASE - MAX_PLY) break;
                 if (root_eval < alpha) {
-                    scoreuci = "cp " + to_string((int)root_eval) + " upperbound";
+                    scoreuci = "cp " + to_string(root_eval) + " upperbound";
                     log_uci_info_string();
                     a += 3;
                 } else if (root_eval > beta) {
-                    scoreuci = "cp " + to_string((int)root_eval) + " lowerbound";
+                    scoreuci = "cp " + to_string(root_eval) + " lowerbound";
                     log_uci_info_string();
                     b += 3;
                 } else {
@@ -169,7 +169,7 @@ public:
                 scoreuci = "mate " + to_string(distanceToMate);
                 stop = 1;
             } else {
-                scoreuci = "cp " + to_string((int)root_eval);
+                scoreuci = "cp " + to_string(root_eval);
             }
 
             pvmove = bestmove;
@@ -187,7 +187,7 @@ public:
         return (movetime - duration <= 30);
     }
 
-    float quiesce(int qply, float alpha, float beta, bool maximizingPlayer) {
+    int quiesce(int qply, int alpha, int beta, bool maximizingPlayer) {
         if ((nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
@@ -196,7 +196,7 @@ public:
         }
         int ply = qply + leafnode_ply;
         seldepth = max(seldepth, ply);
-        float best_value;
+        int best_value;
         bool incheck = board.inCheck();
         chess::Movelist movelist;
         if (incheck) {
@@ -218,7 +218,7 @@ public:
                 beta = min(beta, best_value);
             }
         } else {
-            best_value = (maximizingPlayer ? -INFINITY : INFINITY);
+            best_value = (maximizingPlayer ? INT_MIN : INT_MAX);
         }
 
         move_valuing(movelist, board, chess::Move::NO_MOVE);
@@ -234,7 +234,7 @@ public:
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
                 nodecount++;
-                float score = quiesce(qply + 1, alpha, beta, false);
+                int score = quiesce(qply + 1, alpha, beta, false);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
                 if (best_value < score) {
@@ -254,7 +254,7 @@ public:
                 chess::Move next_capture_move = movelist[i];
                 board.makeMove(next_capture_move);
                 nodecount++;
-                float score = quiesce(qply + 1, alpha, beta, true);
+                int score = quiesce(qply + 1, alpha, beta, true);
                 board.unmakeMove(next_capture_move);
                 if (stop) return 0;
                 if (best_value > score) {
@@ -267,7 +267,7 @@ public:
         return best_value;
     }
 
-    float minimax(int depth, int ply, float alpha, float beta, bool maximizingPlayer) {
+    int minimax(int depth, int ply, int alpha, int beta, bool maximizingPlayer) {
         if ((nodecount & nodespercheck) == 0) {
             if (checktime()) {
                 stop = 1;
@@ -297,9 +297,9 @@ public:
             return quiesce(0, alpha, beta, maximizingPlayer);
         }
 
-        float score;
+        int score;
 
-        float static_eval = Eval::eval(board);
+        int static_eval = Eval::eval(board);
 
         bool nonpvnode = (beta - alpha == 1);
 
@@ -364,8 +364,8 @@ public:
         //HOWEVER, ON CHESSPROGRAMMINGWIKI, WRITING A MOVE TO HISTORY IS NOT NECESSARY 'QUIET', IS NON CAPTURE MOVE
 
         if (maximizingPlayer) {
-            float original_alpha = alpha;
-            float maxEval = -INFINITY;
+            int original_alpha = alpha;
+            int maxEval = INT_MIN;
             for (int i = 0; i < movelist.size(); i++) {
                 int best_index = i;
                 for (int j = i + 1; j < movelist.size(); j++) {
@@ -376,7 +376,7 @@ public:
                 chess::Move next_move = movelist[i];
                 bool quietmove = next_move.score() < CaptureBase;
                 if (quietmove) {
-                    if (allow_futility_pruning && maxEval > -INFINITY) break;
+                    if (allow_futility_pruning && maxEval > INT_MIN) break;
                     quietsearched++;
                 }
                 if (depth <= LMP_DEPTH && basic_pruning_condition) {
@@ -425,8 +425,8 @@ public:
 
             return maxEval;
         } else {
-            float original_beta = beta;
-            float minEval = INFINITY;
+            int original_beta = beta;
+            int minEval = INT_MAX;
             for (int i = 0; i < movelist.size(); i++) {
                 int best_index = i;
                 for (int j = i + 1; j < movelist.size(); j++) {
@@ -437,7 +437,7 @@ public:
                 chess::Move next_move = movelist[i];
                 bool quietmove = next_move.score() < CaptureBase;
                 if (quietmove) {
-                    if (allow_futility_pruning && minEval < INFINITY) break;
+                    if (allow_futility_pruning && minEval < INT_MAX) break;
                     quietsearched++;
                 }
                 if (depth <= LMP_DEPTH && basic_pruning_condition) {

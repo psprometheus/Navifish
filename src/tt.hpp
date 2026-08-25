@@ -9,10 +9,11 @@
 
 struct TTEntry {
     uint64_t key = 0;
-    float eval;
-    chess::Move bestmove;
-    int depth;
-    int flag;
+    int16_t eval;
+    uint16_t bestmove;
+    uint8_t depth;
+    int8_t flag;
+    uint16_t age;
 };
 
 class TTTable {
@@ -29,7 +30,7 @@ public:
         used += !entry.key;
         entry.key = hash;
         entry.eval = eval;
-        entry.bestmove = bestmove;
+        entry.bestmove = bestmove.move();
         entry.depth = depth;
         entry.flag = flag;
     }

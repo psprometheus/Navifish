@@ -32,8 +32,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7c8124ee-b10e-49dc-aa1a-446c54d17390" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/eval.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/search.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/search.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tt.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/tt.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -309,8 +309,17 @@
       <workItem from="1787450942078" duration="23346000" />
       <workItem from="1787528597969" duration="28698000" />
       <workItem from="1787583373340" duration="2326000" />
-      <workItem from="1787635144551" duration="10242000" />
+      <workItem from="1787635144551" duration="14300000" />
     </task>
+    <task id="LOCAL-00001" summary="make rfp more aggresive (100 * depth)">
+      <option name="closed" value="true" />
+      <created>1787666465392</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1787666465392</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -321,6 +330,10 @@
     <isAutomaticFoundErrors value="true" />
     <isAutomaticReloadCMake value="true" />
     <isAutomaticBootstrapAfterUpdate value="false" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="make rfp more aggresive (100 * depth)" />
+    <option name="LAST_COMMIT_MESSAGE" value="make rfp more aggresive (100 * depth)" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
