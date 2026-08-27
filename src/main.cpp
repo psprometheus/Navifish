@@ -18,6 +18,8 @@ void print_board(const chess::Board& board) {
 int main() {
     cout.setf(std::ios::unitbuf);
 
+    cout << "Navifish Chess Engine" << endl;
+
     HistoryReset();
     Eval::init_tables();
     init_lmr();
@@ -31,7 +33,7 @@ int main() {
         ss >> command;
 
         if (command == "uci") {
-            cout << "id name SigmaChessZero" << endl;
+            cout << "id name Navifish" << endl;
             cout << "id author creper1337X" << endl;
             cout << "uciok" << endl;
         } else if (command == "isready") {

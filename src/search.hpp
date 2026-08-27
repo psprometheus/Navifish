@@ -179,6 +179,7 @@ public:
             if (currentDepth++ >= search_depth) stop = 1;
         }
         cout << "bestmove " << chess::uci::moveToUci(bestmove) << endl;
+        TTTable::aging();
     }
 
     bool checktime() {
