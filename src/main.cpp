@@ -20,7 +20,7 @@ int main() {
 
     cout << "Navifish Chess Engine" << endl;
 
-    HistoryReset();
+    History::reset();
     Eval::init_tables();
     init_lmr();
 
@@ -39,7 +39,7 @@ int main() {
         } else if (command == "isready") {
             cout << "readyok" << endl;
         } else if (command == "ucinewgame") {
-            HistoryReset();
+            History::reset();
             board = chess::Board();
         } else if (command == "go") {
             ss >> command;

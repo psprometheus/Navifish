@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "tt.hpp"
+#include "history.hpp"
 #include "eval.hpp"
 
 using namespace std;
@@ -23,8 +24,6 @@ const int FP_DEPTH = 4;
 const int16_t TTMoveScore = 32767;
 const int16_t PVMoveScore = 32766;
 const int16_t CaptureBase = 32700;
-const int16_t HistoryInit = -30000;
-const int16_t HistoryLimit = 30000;
 const int16_t KillerMove1Score = CaptureBase - 50;
 const int16_t KillerMove2Score = CaptureBase - 100;
 
@@ -40,16 +39,6 @@ const int16_t MVV_LVA[7][6] = {
     {0 , 0 , 0 , 0 , 0 , 0 }, // NONE
 //   P , N , B , R , Q , K
 };
-
-inline int16_t ButterflyHeuristic[64][64] = {0};
-
-void HistoryReset() {
-    for (int y = 0; y < 64; y++) {
-        for (int x = 0; x < 64; x++) {
-            ButterflyHeuristic[y][x] = HistoryInit;
-        }
-    }
-}
 
 chess::Move KillerMoves[MAX_PLY][2];
 
@@ -101,7 +90,7 @@ inline bool move_valuing(chess::Movelist& movelist, chess::Board& board, const c
                 move.setScore(KillerMove2Score);
                 continue;
             }
-            int16_t score = ButterflyHeuristic[move.from().index()][move.to().index()];
+            int16_t score = History::data[board.sideToMove()][move.from().index()][move.to().index()];
             move.setScore(score);
         } else {
             int16_t score = MVV_LVA[ptto][ptfrom];
@@ -180,6 +169,7 @@ public:
         }
         cout << "bestmove " << chess::uci::moveToUci(bestmove) << endl;
         TTTable::aging();
+        History::aging();
     }
 
     bool checktime() {
@@ -285,7 +275,6 @@ public:
             else
                 return (board.sideToMove() ? -CONTEMPT_FACTOR : CONTEMPT_FACTOR);
         }
-        bool incheck = board.inCheck();
         TTEntry entry = TTTable::get(board);
         if (ply > 0 && entry.key == board.hash() && entry.depth >= depth) {
             if (entry.flag == EXACT) return entry.eval;
@@ -303,6 +292,8 @@ public:
         int static_eval = Eval::eval(board);
 
         bool nonpvnode = (beta - alpha == 1);
+
+        bool incheck = board.inCheck();
 
         bool basic_pruning_condition = !incheck && nonpvnode;
 
@@ -412,8 +403,7 @@ public:
                             KillerMoves[ply][1] = KillerMoves[ply][0];
                             KillerMoves[ply][0] = next_move;
                         }
-                        if (ButterflyHeuristic[next_move.from().index()][next_move.to().index()] < HistoryLimit)
-                            ButterflyHeuristic[next_move.from().index()][next_move.to().index()] += depth * depth;
+                        History::update(next_move, depth, board.sideToMove());
                     }
                     return maxEval;
                 }
@@ -473,8 +463,7 @@ public:
                             KillerMoves[ply][1] = KillerMoves[ply][0];
                             KillerMoves[ply][0] = next_move;
                         }
-                        if (ButterflyHeuristic[next_move.from().index()][next_move.to().index()] < HistoryLimit)
-                            ButterflyHeuristic[next_move.from().index()][next_move.to().index()] += depth * depth;
+                        History::update(next_move, depth, board.sideToMove());
                     }
                     return minEval;
                 }
