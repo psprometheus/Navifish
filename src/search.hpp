@@ -315,7 +315,7 @@ public:
         }
 
         if (basic_pruning_condition) {
-            int rfp_margin = 100 * depth;
+            int rfp_margin = (100 - 20 * improving) * depth;
             int fp_margin = 85 * depth + 45;
             if (maximizingPlayer) {
                 allow_futility_pruning = depth <= FP_DEPTH && static_eval + fp_margin <= alpha;
