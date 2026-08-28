@@ -120,7 +120,7 @@ struct PVTable {
 
 class Search {
 public:
-    Search(chess::Board& brd, int search_depth, int movetime) : movetime(movetime), board(brd) {
+    Search(chess::Board& brd, int search_depth, int movetime, uint64_t nodelimit) : movetime(movetime), nodelimit(nodelimit), board(brd) {
         rootMaximizing = !static_cast<bool>(board.sideToMove());
         int root_eval, last_eval;
         chess::Move bestmove;
@@ -287,6 +287,8 @@ public:
             return quiesce(0, alpha, beta, maximizingPlayer);
         }
 
+        SearchStack* ss = &MainSearchStack[ply];
+
         int score;
 
         int static_eval = Eval::eval(board);
@@ -298,6 +300,19 @@ public:
         bool basic_pruning_condition = !incheck && nonpvnode;
 
         bool allow_futility_pruning = 0;
+
+        ss->static_eval = static_eval;
+        ss->incheck = incheck;
+
+        bool improving = 1;
+        if (ss->incheck) {
+            improving = 0;
+        } else if (ply >= 2) {
+            if (maximizingPlayer)
+                improving = ss->static_eval > (ss - 2)->static_eval;
+            else
+                improving = ss->static_eval < (ss - 2)->static_eval;
+        }
 
         if (basic_pruning_condition) {
             int rfp_margin = 100 * depth;
@@ -338,7 +353,7 @@ public:
 
         chess::Move bestmove = movelist[0];
 
-        int lmp_limit = 4 + depth * depth;
+        int lmp_threshold = (4 + depth * depth) / (2 - improving);
 
         int quietsearched = 0;
 
@@ -372,11 +387,14 @@ public:
                     quietsearched++;
                 }
                 if (depth <= LMP_DEPTH && basic_pruning_condition) {
-                    if (quietsearched > lmp_limit) break;
+                    if (quietsearched > lmp_threshold) break;
                 }
                 //bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
+                if (++nodecount >= nodelimit) {
+                    stop = 1;
+                    return 0;
+                }
                 board.makeMove(next_move);
-                nodecount++;
                 if (i == 0) {
                     score = minimax(depth - 1, ply + 1, alpha, beta, false);
                 } else {
@@ -432,11 +450,14 @@ public:
                     quietsearched++;
                 }
                 if (depth <= LMP_DEPTH && basic_pruning_condition) {
-                    if (quietsearched > lmp_limit) break;
+                    if (quietsearched > lmp_threshold) break;
                 }
                 //bool killermove = (next_move.score() == KillerMove1Score || next_move.score() == KillerMove2Score);
+                if (++nodecount >= nodelimit) {
+                    stop = 1;
+                    return 0;
+                }
                 board.makeMove(next_move);
-                nodecount++;
                 if (i == 0) {
                     score = minimax(depth - 1, ply + 1, alpha, beta, true);
                 } else {
@@ -490,6 +511,7 @@ private:
     }
 
     const int movetime;
+    const uint64_t nodelimit;
     chrono::time_point<chrono::system_clock, chrono::system_clock::duration> start = chrono::high_resolution_clock::now();
     chess::Movelist movelists[MAX_PLY];
     chess::Board& board;
@@ -501,4 +523,11 @@ private:
     chess::Move pvmove;
     bool rootMaximizing;
     string scoreuci;
+
+    struct SearchStack {
+        int static_eval;
+        bool incheck;
+    };
+
+    SearchStack MainSearchStack[MAX_PLY];
 };

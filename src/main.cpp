@@ -45,14 +45,18 @@ int main() {
             ss >> command;
             int searchdepth = MAX_PLY;
             int movetime = INT_MAX;
+            uint64_t nodelimit = UINT64_MAX;
             if (command == "depth") {
                 ss >> command;
                 searchdepth = stof(command);
             } else if (command == "movetime") {
                 ss >> command;
                 movetime = stof(command);
+            } else if (command == "nodes") {
+                ss >> command;
+                nodelimit = stoull(command);
             }
-            Search search(board, searchdepth, movetime);
+            Search search(board, searchdepth, movetime, nodelimit);
         } else if (command == "position") {
             ss >> command;
             if (command == "fen") {
