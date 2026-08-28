@@ -399,7 +399,7 @@ public:
                     score = minimax(depth - 1, ply + 1, alpha, beta, false);
                 } else {
                     if (depth >= 3 && quietmove && !incheck) {
-                        int reduction = LMRTable[depth][i];
+                        int reduction = LMRTable[depth][i] * (3 - 2 * improving) / 2.0f;
                         score = minimax(depth - reduction, ply + 1, alpha, alpha + 1, false);
                     } else {
                         score = minimax(depth - 1, ply + 1, alpha, alpha + 1, false);
@@ -462,7 +462,7 @@ public:
                     score = minimax(depth - 1, ply + 1, alpha, beta, true);
                 } else {
                     if (depth >= 3 && quietmove && !incheck) {
-                        int reduction = LMRTable[depth][i];
+                        int reduction = LMRTable[depth][i] * (3 - 2 * improving) / 2.0f;
                         score = minimax(depth - reduction, ply + 1, beta - 1, beta, true);
                     } else {
                         score = minimax(depth - 1, ply + 1, beta - 1, beta, true);
