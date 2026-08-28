@@ -3,3 +3,6 @@ cmake-build-release/
 testing/
 test.cpp
 test
+chess.hpp
+debug
+main
