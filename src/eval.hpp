@@ -187,6 +187,8 @@ struct Eval {
         int eg[2];
         int gamePhase = 0;
 
+        //int bishop_count[2]{};
+
         mg[WHITE] = 0;
         mg[BLACK] = 0;
         eg[WHITE] = 0;
@@ -198,10 +200,20 @@ struct Eval {
             int sq = __builtin_ctzll(bb);
             bb &= bb - 1;
             chess::Piece piece = board.at(sq);
+            //bishop_count[piece.color()] += (piece.type() == chess::PieceType::BISHOP);
             mg[piece.color()] += mg_table[piece][FLIP(sq)];
             eg[piece.color()] += eg_table[piece][FLIP(sq)];
             gamePhase += gamephaseInc[piece];
         }
+
+        //if (bishop_count[WHITE] >= 2) {
+        //    mg[WHITE] += mg_bishop_pair;
+        //    eg[WHITE] += eg_bishop_pair;
+        //}
+        //if (bishop_count[BLACK] >= 2) {
+        //    mg[BLACK] += mg_bishop_pair;
+        //    eg[BLACK] += eg_bishop_pair;
+        //}
 
         int mgScore = mg[WHITE] - mg[BLACK];
         int egScore = eg[WHITE] - eg[BLACK];
