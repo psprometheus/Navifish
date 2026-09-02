@@ -1,8 +1,9 @@
-<p align="center">
+<div align="center">
   <img src="logo.png" alt="Navifish Logo" width="250">
   <b>Navifish</b>
+  <br>
   <p>A strong UCI chess engine</p>
-</p>
+</div>
 
 # ♟️ Navifish
 
