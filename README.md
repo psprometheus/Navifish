@@ -1,4 +1,4 @@
-# ♟️ [avifish
+# ♟️ Navifish
 
 **[Navifish]** is an open-source UCI (Universal Chess Interface) compatible chess engine written in C++. This engine was developed for learning about chess programming and has an estimated Elo rating of around **2500**.
 
