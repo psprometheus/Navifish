@@ -1,6 +1,6 @@
 # ♟️ [Navifish]
 
-**[Navifish]** is an open-source UCI (Universal Chess Interface) compatible chess engine written in **[C++/Rust/C...]**. This engine was developed for **[learning about chess programming / participating in computer chess tournaments]** and has an estimated Elo rating of around **[2500]**.
+**[Navifish]** is an open-source UCI (Universal Chess Interface) compatible chess engine written in C++. This engine was developed for learning about chess programming and has an estimated Elo rating of around **2500**.
 
 *Note: [Navifish] is solely a command-line chess engine (backend). To play against it, you will need a UCI-compatible GUI such as [Arena](http://www.playwitharena.de/), [Cutechess](https://cutechess.com/), or [BanksiaGUI](https://banksiagui.com/).*
 
@@ -57,6 +57,7 @@ This project would not have been possible without the following invaluable resou
 * [Chess Programming Wiki][https://chessprogramming.org/]
 * Stockfish's Discord Server
 * [Comparison of state of the art chess sliding piece lookups][https://github.com/Gigantua/Chess_Movegen]
+
 Huge thank to **Disservin et al.** for creating such fascinating and important components:
 * [chess-library][https://github.com/Disservin/chess-library] (chess board rules, uci, etc... which is the heart of this engine)
 * [fastchess][https://github.com/Disservin/fastchess] (SPRT, elo estimating)
