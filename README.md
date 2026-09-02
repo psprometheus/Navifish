@@ -29,7 +29,7 @@ Below are the core algorithms and programming techniques implemented in the engi
 * Improving heuristic
 
 **Evaluation**
-* Navifish currently uses [PeSTO's Evaluation Function][https://chessprogramming.org/PeSTO's_Evaluation_Function]
+* Navifish currently uses [PeSTO's Evaluation Function](https://chessprogramming.org/PeSTO's_Evaluation_Function)
 
 ---
 
@@ -54,11 +54,11 @@ And done, the executable will be located in the 'build' folder
 
 ## 🙏 Acknowledgements
 This project would not have been possible without the following invaluable resources:
-* [Chess Programming Wiki][https://chessprogramming.org/].
+* [Chess Programming Wiki](https://chessprogramming.org/).
 * Stockfish's Discord Server.
-* [Comparison of state of the art chess sliding piece lookups][https://github.com/Gigantua/Chess_Movegen].
+* [Comparison of state of the art chess sliding piece lookups](https://github.com/Gigantua/Chess_Movegen).
 
 Huge thank to **Disservin et al.** for creating such fascinating and important components:
 
-* [chess-library][https://github.com/Disservin/chess-library] (chess board rules, uci, etc... which is the heart of this engine).
-* [fastchess][https://github.com/Disservin/fastchess] (SPRT, elo estimating).
+* [chess-library](https://github.com/Disservin/chess-library) (chess board rules, uci, etc... which is the heart of this engine).
+* [fastchess](https://github.com/Disservin/fastchess) (SPRT, elo estimating).
