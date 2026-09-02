@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.jpeg" alt="Navifish Logo" width="250">
+  <img src="logo.png" alt="Navifish Logo" width="250">
 </p>
 
 # ♟️ Navifish
