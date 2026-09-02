@@ -1,7 +1,7 @@
 <div align="center">
   <img src="logo.png" alt="Navifish Logo" width="250">
   <br>
-  <h2><b>Navifish</b></h2>
+  <strong style="font-size: 30px;">Navifish</strong>
   <br> 
   <br>
   <p>A strong UCI chess engine</p>
