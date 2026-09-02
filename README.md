@@ -42,7 +42,7 @@ Below are the core algorithms and programming techniques implemented in the engi
 
 ### Compiling from Source (Linux/macOS)
 ```bash
-git clone [git@github.com:psprometheus/Navifish.git](git@github.com:psprometheus/Navifish.git)
+git clone git@github.com:psprometheus/Navifish.git
 cd Navifish
 mkdir build && cd build
 cmake ..
